@@ -10,14 +10,33 @@ function getCountryFromIP($ip) {
     if ($ip === '127.0.0.1' || $ip === 'localhost' || strpos($ip, '192.168.') === 0 || strpos($ip, '10.') === 0) {
         return 'محلي';
     }
+    
+    // محاولة جلب الدولة من ip-api.com (أسرع وأكثر استقراراً في بعض الأحيان)
     try {
         $ctx = stream_context_create(['http' => ['timeout' => 2]]);
-        $response = @file_get_contents("https://ipapi.co/{$ip}/json/", false, $ctx);
+        $response = @file_get_contents("http://ip-api.com/json/{$ip}?fields=status,country,countryCode", false, $ctx);
         if ($response !== false) {
             $data = json_decode($response, true);
-            return $data['country_name'] ?? 'غير معروف';
+            if (isset($data['status']) && $data['status'] === 'success') {
+                $country = $data['country'];
+                
+                // ترجمة بسيطة لأهم الدول
+                $translations = [
+                    'Qatar' => 'قطر',
+                    'Egypt' => 'مصر',
+                    'Saudi Arabia' => 'السعودية',
+                    'Kuwait' => 'الكويت',
+                    'United Arab Emirates' => 'الإمارات',
+                    'Jordan' => 'الأردن',
+                    'Oman' => 'عمان',
+                    'Bahrain' => 'البحرين'
+                ];
+                
+                return $translations[$country] ?? $country;
+            }
         }
     } catch (Exception $e) {}
+    
     return 'غير معروف';
 }
 

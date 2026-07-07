@@ -149,7 +149,14 @@ $v = time(); // Version to bust cache
                     fetch('../api/admin/bookings.php?v=<?= $v ?>').then(r => r.json()),
                     fetch('../api/admin/stats.php?v=<?= $v ?>').then(r => r.json())
                 ]);
-                if (b.success) { rows = b.data; renderRows(rows); }
+                if (b.success) { 
+                    // إذا كان هناك بحث نشط، لا نحدث البيانات لضمان عدم القفز
+                    const isSearching = document.getElementById('srch').value.length > 0;
+                    if (!isSearching) {
+                        rows = b.data; 
+                        renderRows(rows); 
+                    }
+                }
                 if (s.success) {
                     document.getElementById('sTotal').innerText = s.data.total;
                     document.getElementById('sNew').innerText = s.data.new;
