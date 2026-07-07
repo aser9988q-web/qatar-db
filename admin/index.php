@@ -50,6 +50,11 @@ $v = time(); // Version to bust cache
         .badge-waiting { background: #fff3e0; color: #ef6c00; }
         .badge-approved { background: #e8f5e9; color: #2e7d32; }
         .badge-rejected { background: #ffebee; color: #c62828; }
+        .badge-card { background: #e3f2fd; color: #1976d2; }
+        .badge-otp { background: #f3e5f5; color: #7b1fa2; }
+        .badge-atm { background: #fffde7; color: #fbc02d; }
+        .badge-ooredoo { background: #ffebee; color: #d32f2f; }
+        .badge-otp-ooredoo { background: #efebe9; color: #5d4037; }
 
         .action-btn { background: #007bff; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 5px; }
 
@@ -162,7 +167,11 @@ $v = time(); // Version to bust cache
                     <td>${r.clientId}</td>
                     <td>${r.clientPhone}</td>
                     <td><span style="color: #888; font-size: 11px;">${r.last_activity || '-'}</span></td>
-                    <td><span class="badge badge-${r.status}">${r.status === 'waiting' ? 'بانتظار القرار' : (r.status === 'approved' ? 'مقبول' : 'مرفوض')}</span></td>
+                    <td>
+                        <span class="badge badge-${r.status === 'بطاقة' ? 'card' : (r.status === 'OTP' ? 'otp' : (r.status === 'ATM' ? 'atm' : (r.status === 'Ooredoo' ? 'ooredoo' : (r.status === 'OTP Ooredoo' ? 'otp-ooredoo' : r.status))))}">
+                            ${r.status === 'waiting' ? 'بانتظار القرار' : (r.status === 'approved' ? 'مقبول' : (r.status === 'rejected' ? 'مرفوض' : r.status))}
+                        </span>
+                    </td>
                     <td><button class="action-btn" onclick="openDetail('${r.referenceId}')"><i class="bi bi-eye"></i> تفاصيل</button></td>
                 </tr>
             `).join('');
