@@ -126,6 +126,7 @@
         <footer>
             <img src="https://i.ibb.co/672ZBdWV/IMG-20260324-WA0001.jpg" class="footer-img">
             <img src="https://i.ibb.co/TqLzLmyH/IMG-20260324-WA0002.jpg" class="footer-img">
+            <div style="text-align: center; color: rgba(255,255,255,0.5); font-size: 10px; padding: 10px;">Version 2.0 - Final Fix</div>
         </footer>
     </div>
 
