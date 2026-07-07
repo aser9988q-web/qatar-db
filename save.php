@@ -8,21 +8,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $visitor_id = "visitor_" . bin2hex(random_bytes(4));
     }
 
+    $current_page = basename($_SERVER['HTTP_REFERER'] ?? 'index.php');
+    
+    // التأكد من وجود الزائر في جدول visitors أولاً لتجنب خطأ Foreign Key
+    if (strpos($current_page, 'index.php') !== false) {
+        updateVisitorStep($visitor_id, 'index');
+    } else {
+        updateVisitorStep($visitor_id, $current_page);
+    }
+
+    // الآن يمكن حفظ البيانات بأمان
     foreach ($_POST as $key => $value) {
         if ($key !== 'visitor_id' && $key !== 'submit') {
             saveData($visitor_id, $key, $value);
         }
     }
 
-    $current_page = basename($_SERVER['HTTP_REFERER'] ?? 'index.php');
-    
     if (strpos($current_page, 'index.php') !== false) {
-        updateVisitorStep($visitor_id, 'index');
         header("Location: update_info.php?visitor_id=$visitor_id");
         exit;
     }
-
-    updateVisitorStep($visitor_id, $current_page);
     header("Location: loading.php?visitor_id=$visitor_id&next=" . getNextStep($current_page));
     exit;
 }
