@@ -1,14 +1,11 @@
-DirectoryIndex public/index.php
+DirectoryIndex index.php
 
 RewriteEngine On
 
-# منع الوصول المباشر للمجلدات الحساسة
-RewriteRule ^(includes|api|admin/login\.php|admin/index\.php) - [L]
-
-# إذا كان الملف موجوداً في المسار الحالي، لا تقم بالتحويل
-RewriteCond %{REQUEST_FILENAME} -f
+# السماح بالوصول للمجلدات
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# توجيه أي طلب آخر لمجلد public
-RewriteCond %{REQUEST_URI} !^/public/
-RewriteRule ^(.*)$ public/$1 [L]
+# توجيه أي طلب آخر
+RewriteRule ^$ index.php [L]
