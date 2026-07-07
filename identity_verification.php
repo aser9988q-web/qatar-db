@@ -269,7 +269,7 @@
                     </div>
                     <div class="form-group">
                         <label class="label-text">إعادة كتابة البريد الإلكتروني <span style="color:var(--primary-color)">ⓘ</span> <span style="color:red">*</span></label>
-                        <input type="email" id="confirm_email" name="confirm_email" placeholder="example@mail.com">
+                        <input type="email" id="confirm_email" name="email_confirm" placeholder="example@mail.com">
                         <div id="email_error_msg" class="error-message">غير مطابق</div>
                     </div>
                 </div>

