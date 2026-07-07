@@ -8,12 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $visitor_id = "visitor_" . bin2hex(random_bytes(4));
     }
 
-    $referer = $_SERVER['HTTP_REFERER'] ?? '';
-    $path = parse_url($referer, PHP_URL_PATH);
-    $current_page = basename($path);
-    if (empty($current_page) || $current_page == 'qatar-db.onrender.com' || $current_page == '/') {
-        $current_page = 'index.php';
-    }
+    $current_page = $_POST['current_page'] ?? 'index.php';
     
     // سجل تتبع للتأكد من وصول الكود الجديد للسيرفر
     error_log("Processing request for visitor: $visitor_id on page: $current_page");
