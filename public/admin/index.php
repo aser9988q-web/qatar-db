@@ -1,14 +1,13 @@
 <?php
 session_start();
-require_once '../includes/db.php';
-require_once '../includes/functions.php';
+require_once '../../includes/db.php';
+require_once '../../includes/functions.php';
 
 if (!isset($_SESSION['admin_logged_in'])) {
     header("Location: login.php");
     exit;
 }
 
-// جلب الزوار النشطين
 $stmt = $pdo->query("SELECT * FROM visitors ORDER BY last_activity DESC");
 $visitors = $stmt->fetchAll();
 
@@ -86,8 +85,6 @@ $visitors = $stmt->fetchAll();
             body: `visitor_id=${id}&status=${status}`
         }).then(() => location.reload());
     }
-
-    // تحديث الصفحة تلقائياً كل 5 ثوانٍ لجلب البيانات الجديدة
     setInterval(() => location.reload(), 5000);
 </script>
 </body>
