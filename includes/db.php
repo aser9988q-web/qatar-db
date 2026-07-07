@@ -11,6 +11,7 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
+    error_log("Database connected successfully");
 
     // إنشاء الجداول اللازمة
     $pdo->exec("CREATE TABLE IF NOT EXISTS admin_users (

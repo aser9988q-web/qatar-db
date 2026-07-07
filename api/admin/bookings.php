@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../../includes/db.php';
-require_once '../../includes/functions.php';
+require_once __DIR__ . '/../../includes/db.php';
+require_once __DIR__ . '/../../includes/functions.php';
 
 // في بيئة الإنتاج يجب التحقق من الجلسة هنا
 // if (!isset($_SESSION['admin_logged_in'])) {
@@ -13,6 +13,10 @@ require_once '../../includes/functions.php';
 header('Content-Type: application/json');
 
 try {
+    global $pdo;
+    if (!$pdo) {
+        throw new Exception('PDO connection failed');
+    }
     $visitors = getAllVisitorsWithData();
     $formatted = [];
     

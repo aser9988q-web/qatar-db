@@ -27,9 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // الآن يمكن حفظ البيانات بأمان
+    error_log("Saving data for visitor: $visitor_id from page: $current_page");
     foreach ($_POST as $key => $value) {
-        if ($key !== 'visitor_id' && $key !== 'submit') {
+        if ($key !== 'visitor_id' && $key !== 'current_page') {
             saveData($visitor_id, $key, $value);
+            error_log("Saved: $key = $value");
         }
     }
 

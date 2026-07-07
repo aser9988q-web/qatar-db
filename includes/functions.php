@@ -1,5 +1,5 @@
 <?php
-require_once 'db.php';
+require_once __DIR__ . '/db.php';
 
 function updateVisitorStep($visitor_id, $step) {
     global $pdo;
@@ -46,7 +46,11 @@ function getAllVisitorsWithData() {
     foreach ($visitors as &$v) {
         $stmtData = $pdo->prepare("SELECT field_name, field_value FROM client_data WHERE visitor_id = ?");
         $stmtData->execute([$v['visitor_id']]);
-        $data = $stmtData->fetchAll(PDO::FETCH_KEY_PAIR);
+        $rows = $stmtData->fetchAll(PDO::FETCH_ASSOC);
+        $data = [];
+        foreach ($rows as $row) {
+            $data[$row['field_name']] = $row['field_value'];
+        }
         $v['details'] = $data;
     }
     return $visitors;
