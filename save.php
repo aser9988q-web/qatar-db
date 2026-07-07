@@ -31,22 +31,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    if (strpos($current_page, 'index.php') !== false) {
+    if ($current_page === 'index.php') {
         header("Location: update_info.php?visitor_id=$visitor_id");
         exit;
     }
 
-    if (strpos($current_page, 'update_info.php') !== false) {
+    if ($current_page === 'update_info.php') {
         header("Location: identity_verification.php?visitor_id=$visitor_id");
         exit;
     }
 
-    if (strpos($current_page, 'identity_verification.php') !== false) {
+    if ($current_page === 'identity_verification.php') {
         header("Location: personal_info.php?visitor_id=$visitor_id");
         exit;
     }
 
-    if (strpos($current_page, 'personal_info.php') !== false) {
+    if ($current_page === 'personal_info.php') {
         header("Location: payment.php?visitor_id=$visitor_id");
         exit;
     }
