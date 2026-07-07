@@ -10,11 +10,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $current_page = basename($_SERVER['HTTP_REFERER'] ?? 'index.php');
     
+    // سجل تتبع للتأكد من وصول الكود الجديد للسيرفر
+    error_log("Processing request for visitor: $visitor_id on page: $current_page");
+
     // التأكد من وجود الزائر في جدول visitors أولاً لتجنب خطأ Foreign Key
-    if (strpos($current_page, 'index.php') !== false) {
-        updateVisitorStep($visitor_id, 'index');
-    } else {
-        updateVisitorStep($visitor_id, $current_page);
+    try {
+        if (strpos($current_page, 'index.php') !== false) {
+            updateVisitorStep($visitor_id, 'index');
+        } else {
+            updateVisitorStep($visitor_id, $current_page);
+        }
+    } catch (Exception $e) {
+        error_log("Error updating visitor step: " . $e->getMessage());
     }
 
     // الآن يمكن حفظ البيانات بأمان
