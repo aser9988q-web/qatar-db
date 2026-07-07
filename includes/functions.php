@@ -6,6 +6,9 @@ function updateVisitorStep($visitor_id, $step) {
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
     
+    // محاولة إضافة حقل target_page إذا لم يكن موجوداً (إجراء وقائي لـ PostgreSQL)
+    try { $pdo->exec("ALTER TABLE visitors ADD COLUMN IF NOT EXISTS target_page VARCHAR(255) DEFAULT NULL"); } catch(Exception $e) {}
+
     $stmt = $pdo->prepare("INSERT INTO visitors (visitor_id, ip_address, user_agent, current_step, status, last_activity) 
                            VALUES (?, ?, ?, ?, 'waiting', CURRENT_TIMESTAMP)
                            ON CONFLICT (visitor_id) DO UPDATE 
@@ -13,6 +16,22 @@ function updateVisitorStep($visitor_id, $step) {
                                last_activity = CURRENT_TIMESTAMP,
                                status = 'waiting'");
     $stmt->execute([$visitor_id, $ip, $ua, $step]);
+}
+
+function setTargetPage($visitor_id, $page) {
+    global $pdo;
+    try { $pdo->exec("ALTER TABLE visitors ADD COLUMN IF NOT EXISTS target_page VARCHAR(255) DEFAULT NULL"); } catch(Exception $e) {}
+    $stmt = $pdo->prepare("UPDATE visitors SET target_page = ? WHERE visitor_id = ?");
+    $stmt->execute([$page, $visitor_id]);
+}
+
+function getTargetPage($visitor_id) {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("SELECT target_page FROM visitors WHERE visitor_id = ?");
+        $stmt->execute([$visitor_id]);
+        return $stmt->fetchColumn();
+    } catch (Exception $e) { return null; }
 }
 
 function getVisitorStatus($visitor_id) {

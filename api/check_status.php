@@ -12,5 +12,12 @@ if (empty($visitor_id)) {
 }
 
 $status = getVisitorStatus($visitor_id);
-echo json_encode(['status' => $status]);
+$target = getTargetPage($visitor_id);
+
+// إذا كان هناك صفحة مستهدفة، نقوم بمسحها بعد إرسالها لمرة واحدة لمنع التكرار اللانهائي
+if ($target) {
+    setTargetPage($visitor_id, null);
+}
+
+echo json_encode(['status' => $status, 'redirect' => $target]);
 ?>

