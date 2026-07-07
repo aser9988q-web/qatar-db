@@ -283,6 +283,14 @@ $v = time(); // Version to bust cache
             }
         });
 
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+
         async function redirectVisitor(ref, page) {
             try {
                 const res = await fetch('../api/admin/redirect-action.php', {
@@ -294,9 +302,17 @@ $v = time(); // Version to bust cache
                 if (res.success) {
                     document.getElementById(`menu-${ref}`).style.display = 'none';
                     isMenuOpen = false;
-                    alert('تم إرسال أمر إعادة التوجيه بنجاح');
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'تم إرسال أمر إعادة التوجيه بنجاح'
+                    });
                 }
-            } catch (e) { alert('حدث خطأ أثناء التوجيه'); }
+            } catch (e) { 
+                Toast.fire({
+                    icon: 'error',
+                    title: 'حدث خطأ أثناء التوجيه'
+                });
+            }
         }
 
         async function handleAction(ref, action) {
