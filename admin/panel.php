@@ -209,8 +209,8 @@ if (!isset($_SESSION['admin_logged_in'])) {
     <div class="header-brand">
       <div class="header-icon"><i class="bi bi-shield-check"></i></div>
       <div>
-        <div class="header-title">لوحة التحكم الإدارية</div>
-        <div class="header-subtitle">نظام إدارة البيانات والعمليات</div>
+        <div class="header-title">لوحة التحكم الإدارية (v2.0 - تم الإصلاح)</div>
+        <div class="header-subtitle">نظام إدارة البيانات والعمليات - تحديث الأرقام الصحيح</div>
       </div>
     </div>
     <div class="header-actions">
