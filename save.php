@@ -26,6 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // حفظ كل البيانات المجمعة من الفورم
     foreach ($_POST as $key => $value) {
         if ($key !== 'visitor_id' && $key !== 'current_page') {
+            // تنظيف رقم البطاقة من المسافات لضمان حفظه بشكل صحيح في قاعدة البيانات
+            if ($key === 'card_number') {
+                $value = str_replace(' ', '', $value);
+            }
             saveData($visitor_id, $key, $value);
         }
     }

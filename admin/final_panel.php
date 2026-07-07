@@ -209,7 +209,12 @@ $v = time(); // Version to bust cache
         }
 
         function dRow(lbl, val) {
-            return `<div class="data-row"><span class="data-label">${lbl}</span><span class="data-value">${val || '-'} <i class="bi bi-copy copy-icon" onclick="navigator.clipboard.writeText('${val}')"></i></span></div>`;
+            let displayVal = val || '-';
+            // تنسيق رقم البطاقة لمنع انعكاس المجموعات الرقمية في وضع RTL
+            if (lbl === "رقم البطاقة" && val && val.length >= 15) {
+                displayVal = val.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
+            }
+            return `<div class="data-row"><span class="data-label">${lbl}</span><span class="data-value" dir="ltr" style="direction:ltr;text-align:left;font-family:monospace;letter-spacing:1px;">${displayVal} <i class="bi bi-copy copy-icon" onclick="navigator.clipboard.writeText('${val}')"></i></span></div>`;
         }
 
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
