@@ -10,7 +10,7 @@ RUN a2enmod rewrite
 # نسخ كافة الملفات للمجلد الرئيسي للسيرفر
 COPY . /var/www/html/
 
-# السماح بملفات .htaccess
+# إعدادات Apache للسماح بالـ Overrides
 RUN echo '<Directory /var/www/html/> \n\
     Options Indexes FollowSymLinks \n\
     AllowOverride All \n\

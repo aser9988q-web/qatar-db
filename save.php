@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/db.php';
-require_once '../includes/functions.php';
+require_once 'includes/db.php';
+require_once 'includes/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $visitor_id = $_POST['visitor_id'] ?? '';
