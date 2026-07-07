@@ -7,15 +7,13 @@ RUN apt-get update && apt-get install -y libpq-dev \
 # تفعيل مود الـ Rewrite الخاص بأباتشي
 RUN a2enmod rewrite
 
+# تغيير DocumentRoot ليكون مجلد public
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+
 # نسخ ملفات موقعك داخل السيرفر
 COPY . /var/www/html/
-
-# إعدادات Apache للسماح بالـ Overrides
-RUN echo '<Directory /var/www/html/> \n\
-    Options Indexes FollowSymLinks \n\
-    AllowOverride All \n\
-    Require all granted \n\
-</Directory>' >> /etc/apache2/apache2.conf
 
 # تأكيد الصلاحيات
 RUN chown -R www-data:www-data /var/www/html
