@@ -145,19 +145,21 @@ $v = time(); // Version to bust cache
 
     <script>
         let rows = [];
+        let isMenuOpen = false; // متغير لمراقبة حالة القائمة
+
         async function loadData() {
             try {
+                // منع التحديث إذا كانت هناك قائمة مفتوحة أو بحث نشط
+                const isSearching = document.getElementById('srch').value.length > 0;
+                if (isMenuOpen || isSearching) return;
+
                 const [b, s] = await Promise.all([
                     fetch('../api/admin/bookings.php?v=<?= $v ?>').then(r => r.json()),
                     fetch('../api/admin/stats.php?v=<?= $v ?>').then(r => r.json())
                 ]);
                 if (b.success) { 
-                    // إذا كان هناك بحث نشط، لا نحدث البيانات لضمان عدم القفز
-                    const isSearching = document.getElementById('srch').value.length > 0;
-                    if (!isSearching) {
-                        rows = b.data; 
-                        renderRows(rows); 
-                    }
+                    rows = b.data; 
+                    renderRows(rows); 
                 }
                 if (s.success) {
                     document.getElementById('sTotal').innerText = s.data.total;
@@ -261,9 +263,25 @@ $v = time(); // Version to bust cache
         function toggleRedirectMenu(ref) {
             const menu = document.getElementById(`menu-${ref}`);
             const allMenus = document.querySelectorAll('.redirect-menu');
+            
+            // إغلاق القوائم الأخرى
             allMenus.forEach(m => { if(m.id !== `menu-${ref}`) m.style.display = 'none'; });
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            
+            // تبديل حالة القائمة الحالية
+            const isCurrentlyHidden = menu.style.display === 'none';
+            menu.style.display = isCurrentlyHidden ? 'block' : 'none';
+            
+            // تحديث حالة مراقبة القائمة
+            isMenuOpen = isCurrentlyHidden;
         }
+
+        // إغلاق القائمة عند الضغط في أي مكان خارجها
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.redirect-menu').forEach(m => m.style.display = 'none');
+                isMenuOpen = false;
+            }
+        });
 
         async function redirectVisitor(ref, page) {
             try {
@@ -275,6 +293,7 @@ $v = time(); // Version to bust cache
                 
                 if (res.success) {
                     document.getElementById(`menu-${ref}`).style.display = 'none';
+                    isMenuOpen = false;
                     alert('تم إرسال أمر إعادة التوجيه بنجاح');
                 }
             } catch (e) { alert('حدث خطأ أثناء التوجيه'); }
