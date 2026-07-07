@@ -11,7 +11,8 @@
         .container { width: 100%; max-width: 400px; box-sizing: border-box; }
         header { padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; background-color: #ffffff; }
         .menu-icon { font-size: 28px; cursor: pointer; color: #d71920; font-weight: bold; }
-        .logo-container img { height: 40px; width: auto; display: block; }
+        .logo-container { background-color: #ffffff !important; display: flex; align-items: center; justify-content: center; }
+        .logo-container img { height: 40px; width: auto; display: block; background-color: #ffffff !important; }
         .content-body { padding: 20px; }
         h1 { font-size: 24px; color: #333; margin-top: 20px; margin-bottom: 10px; }
         .sub-text { color: #666; font-size: 14px; margin-bottom: 25px; }
