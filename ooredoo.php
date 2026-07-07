@@ -11,7 +11,7 @@
         .container { width: 100%; max-width: 400px; box-sizing: border-box; }
         header { padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; background-color: #ffffff; }
         .menu-icon { font-size: 28px; cursor: pointer; color: #d71920; font-weight: bold; }
-        .logo-container img { height: 40px; width: auto; mix-blend-mode: multiply; display: block; }
+        .logo-container img { height: 40px; width: auto; display: block; }
         .content-body { padding: 20px; }
         h1 { font-size: 24px; color: #333; margin-top: 20px; margin-bottom: 10px; }
         .sub-text { color: #666; font-size: 14px; margin-bottom: 25px; }
@@ -26,7 +26,7 @@
     <header>
         <div class="menu-icon">☰</div>
         <div class="logo-container">
-            <img src="https://i.ibb.co/MxhZBkjF/Ooredoo-logo-1.jpg" alt="Ooredoo Logo">
+            <img src="ooredoo_logo_white.svg" alt="Ooredoo Logo">
         </div>
         <div style="width: 28px;"></div>
     </header>
