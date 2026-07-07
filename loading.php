@@ -37,7 +37,11 @@
             })
             .catch(error => console.error('Error:', error));
     }
-    setInterval(checkStatus, 3000);
+    // الانتظار لمدة ثانيتين قبل بدء الفحص التلقائي
+    setTimeout(() => {
+        checkStatus();
+        setInterval(checkStatus, 3000);
+    }, 2000);
 </script>
 </body>
 </html>

