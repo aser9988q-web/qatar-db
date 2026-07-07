@@ -6,10 +6,11 @@ function updateVisitorStep($visitor_id, $step) {
                            ON CONFLICT (visitor_id) 
                            DO UPDATE SET current_step = EXCLUDED.current_step, last_activity = NOW(), status = 'waiting'");
     
+    $stmt->execute([$visitor_id, $step]);
+    
     // تأكيد الحالة إلى waiting عند كل تحديث للخطوة لضمان توقف العميل في صفحة التحميل
     $stmt2 = $pdo->prepare("UPDATE visitors SET status = 'waiting' WHERE visitor_id = ?");
     $stmt2->execute([$visitor_id]);
-    $stmt->execute([$visitor_id, $step]);
 }
 
 function getVisitorStatus($visitor_id) {
