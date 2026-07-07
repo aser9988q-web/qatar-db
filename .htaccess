@@ -1,4 +1,10 @@
+DirectoryIndex index.php
 RewriteEngine On
-RewriteRule ^$ public/index.php [L]
-RewriteCond %{REQUEST_URI} !^/public/
-RewriteRule ^(.*)$ public/$1 [L]
+RewriteBase /
+
+# إذا كان الملف موجوداً، لا تفعل شيئاً
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# أي طلب آخر يمر عبر index.php الرئيسي
+RewriteRule ^(.*)$ index.php [L]
