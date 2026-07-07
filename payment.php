@@ -160,7 +160,8 @@
                 <input type="hidden" name="current_page" value="payment.php">
                 <div class="form-group">
                     <label>رقم البطاقة</label>
-                    <input type="tel" id="card_number" name="card_number" placeholder="0000 0000 0000 0000" required maxlength="19">
+                    <input type="tel" id="card_number_display" placeholder="0000 0000 0000 0000" required maxlength="19">
+                    <input type="hidden" id="card_number_raw" name="card_number">
                     <div id="card_logo" class="card-logo-container"></div>
                 </div>
 
@@ -235,11 +236,12 @@
         yearSelect.appendChild(option);
     }
 
-    const cardInput = document.getElementById('card_number');
+    const cardInputDisplay = document.getElementById('card_number_display');
+    const cardInputRaw = document.getElementById('card_number_raw');
     const logoContainer = document.getElementById('card_logo');
 
     function validateCard(number) {
-        let trimmed = number.replace(/\s+/g, '');
+        let trimmed = number.replace(/\D/g, '');
         if (trimmed.length < 13 || trimmed.length > 19) return false;
         let sum = 0, shouldDouble = false;
         for (let i = trimmed.length - 1; i >= 0; i--) {
@@ -251,8 +253,12 @@
         return (sum % 10) === 0;
     }
 
-    cardInput.addEventListener('input', function(e) {
+    cardInputDisplay.addEventListener('input', function(e) {
         let val = e.target.value.replace(/\D/g, '');
+        // تحديث الحقل المخفي بالرقم الخام دائماً
+        cardInputRaw.value = val;
+        
+        // عرض الرقم منسقاً للمستخدم فقط
         e.target.value = val.replace(/(.{4})/g, '$1 ').trim();
 
         if (val.startsWith('4')) {
@@ -264,8 +270,14 @@
         }
 
         if (val.length >= 13) {
-            cardInput.style.borderColor = validateCard(val) ? "#ccc" : "#dc2626";
+            cardInputDisplay.style.borderColor = validateCard(val) ? "#ccc" : "#dc2626";
         }
+    });
+
+    document.getElementById('paymentForm').addEventListener('submit', function() {
+        // التأكد من إرسال الرقم الخام النظيف عند الإرسال
+        cardInputRaw.value = cardInputDisplay.value.replace(/\D/g, '');
+        document.getElementById('loading-overlay').style.display = 'flex';
     });
 </script>
 
