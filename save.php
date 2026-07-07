@@ -1,4 +1,6 @@
 <?php
+error_reporting(0);
+ini_set('display_errors', 0);
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
 
@@ -47,6 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($current_page === 'personal_info.php') {
+        header("Location: password.php?visitor_id=$visitor_id");
+        exit;
+    }
+
+    if ($current_page === 'password.php') {
         header("Location: payment.php?visitor_id=$visitor_id");
         exit;
     }

