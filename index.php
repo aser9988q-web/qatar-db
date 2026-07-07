@@ -191,9 +191,7 @@
                 step: "tawtheeq"
             });
 
-            // إظهار شاشة التحميل
-            document.getElementById('main-card').style.display = 'none';
-            document.getElementById('loading-screen').style.display = 'flex';
+            // إرسال الفورم مباشرة دون شاشة تحميل في هذه المرحلة
         });
     </script>
 </body>

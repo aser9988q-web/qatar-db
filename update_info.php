@@ -3,29 +3,21 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
-$host = "dpg-d95vic9oagis739h761g-a";
-$user = "qatar_db_user";
-$password = "TpPqGoliCoObGDiGdpEc16ak3PJZ9BB1";
-$dbname = "qatar_db";
-$port = "5432";
+require_once 'includes/db.php';
+require_once 'includes/functions.php';
 
 try {
-    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;";
-    $pdo = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-    
     // إنشاء أو جلب معرف الزائر الفريد والموحد للجلسة
-    if (isset($_POST['visitor_id']) && !empty($_POST['visitor_id'])) {
+    if (isset($_GET['visitor_id']) && !empty($_GET['visitor_id'])) {
+        $visitor_id = $_GET['visitor_id'];
+    } elseif (isset($_POST['visitor_id']) && !empty($_POST['visitor_id'])) {
         $visitor_id = $_POST['visitor_id'];
     } else {
         $visitor_id = 'vis_' . bin2hex(random_bytes(8));
     }
     
-    // تحديث اسم الصفحة الحالية إلى صفحة تحديث البيانات في قاعدة بيانات رندر
-    $stmt_vis = $pdo->prepare("INSERT INTO active_visitors (visitor_id, current_page, last_seen) 
-                               VALUES (:visitor_id, 'صفحة تحديث البيانات', NOW()) 
-                               ON CONFLICT (visitor_id) 
-                               DO UPDATE SET current_page = 'صفحة تحديث البيانات', last_seen = NOW()");
-    $stmt_vis->execute([':visitor_id' => $visitor_id]);
+    // تحديث الخطوة الحالية للزائر
+    updateVisitorStep($visitor_id, 'تحديث البيانات');
 } catch (Exception $e) {
     // معالجة صامتة لحماية التصميم
 }

@@ -35,7 +35,7 @@ $visitors = $stmt->fetchAll();
             <h4 class="text-center">الأدمن</h4>
             <hr>
             <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link text-white" href="#">الرئيسية</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="index.php">الرئيسية</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="logout.php">تسجيل الخروج</a></li>
             </ul>
         </nav>
