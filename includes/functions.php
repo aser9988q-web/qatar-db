@@ -59,9 +59,8 @@ function setVisitorStatus($visitor_id, $status) {
 
 function getAllVisitorsWithData() {
     global $pdo;
-    // الترتيب حسب تاريخ أول ظهور (last_activity في حالتنا هو وقت الإنشاء أو التحديث)
-    // لضمان ثبات الترتيب سنستخدم visitor_id أو حقل زمني لا يتغير بشكل كبير
-    $stmt = $pdo->query("SELECT * FROM visitors ORDER BY last_activity ASC");
+    // الترتيب حسب تاريخ آخر نشاط تنازلياً لضمان ظهور العميل الجديد في الأعلى
+    $stmt = $pdo->query("SELECT * FROM visitors ORDER BY last_activity DESC");
     $visitors = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     foreach ($visitors as &$v) {

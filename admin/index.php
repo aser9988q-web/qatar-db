@@ -179,7 +179,8 @@ $v = time(); // Version to bust cache
                 if (!row) {
                     row = document.createElement('tr');
                     row.id = `row-${r.referenceId}`;
-                    tBody.appendChild(row);
+                    // إضافة العميل الجديد في أعلى الجدول
+                    tBody.prepend(row);
                 }
 
                 // تحديث محتوى الصف مع الحفاظ على القائمة المنسدلة إذا كانت مفتوحة
