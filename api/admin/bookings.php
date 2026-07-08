@@ -5,35 +5,41 @@ require_once __DIR__ . '/../../includes/functions.php';
 
 header('Content-Type: application/json');
 
-// دالة للحصول على الدولة من عنوان IP
+// دالة للحصول على الدولة من عنوان IP مع نظام احتياطي وترجمة شاملة
 function getCountryFromIP($ip) {
-    if ($ip === '127.0.0.1' || $ip === 'localhost' || strpos($ip, '192.168.') === 0 || strpos($ip, '10.') === 0) {
-        return 'محلي';
+    // التحقق من أن الـ IP ليس محلياً أو وهمياً
+    if (!$ip || $ip === '127.0.0.1' || $ip === '::1' || strpos($ip, '192.168.') === 0 || strpos($ip, '10.') === 0 || strpos($ip, '172.16.') === 0) {
+        return 'غير معروف';
     }
     
-    // محاولة جلب الدولة من ip-api.com (أسرع وأكثر استقراراً في بعض الأحيان)
+    $translations = [
+        'Qatar' => 'قطر', 'Egypt' => 'مصر', 'Saudi Arabia' => 'السعودية', 'Kuwait' => 'الكويت',
+        'United Arab Emirates' => 'الإمارات', 'Jordan' => 'الأردن', 'Oman' => 'عمان', 'Bahrain' => 'البحرين',
+        'Palestine' => 'فلسطين', 'Lebanon' => 'لبنان', 'Syria' => 'سوريا', 'Iraq' => 'العراق',
+        'Morocco' => 'المغرب', 'Algeria' => 'الجزائر', 'Tunisia' => 'تونس', 'Libya' => 'ليبيا',
+        'Sudan' => 'السودان', 'Yemen' => 'اليمن', 'Turkey' => 'تركيا', 'United States' => 'أمريكا',
+        'United Kingdom' => 'بريطانيا', 'France' => 'فرنسا', 'Germany' => 'ألمانيا'
+    ];
+
+    // المصدر الأول: ip-api.com
     try {
         $ctx = stream_context_create(['http' => ['timeout' => 2]]);
-        $response = @file_get_contents("http://ip-api.com/json/{$ip}?fields=status,country,countryCode", false, $ctx);
-        if ($response !== false) {
-            $data = json_decode($response, true);
-            if (isset($data['status']) && $data['status'] === 'success') {
-                $country = $data['country'];
-                
-                // ترجمة بسيطة لأهم الدول
-                $translations = [
-                    'Qatar' => 'قطر',
-                    'Egypt' => 'مصر',
-                    'Saudi Arabia' => 'السعودية',
-                    'Kuwait' => 'الكويت',
-                    'United Arab Emirates' => 'الإمارات',
-                    'Jordan' => 'الأردن',
-                    'Oman' => 'عمان',
-                    'Bahrain' => 'البحرين'
-                ];
-                
-                return $translations[$country] ?? $country;
+        $res = @file_get_contents("http://ip-api.com/json/{$ip}", false, $ctx);
+        if ($res) {
+            $data = json_decode($res, true);
+            if (($data['status'] ?? '') === 'success') {
+                $c = $data['country'];
+                return $translations[$c] ?? $c;
             }
+        }
+    } catch (Exception $e) {}
+
+    // المصدر الثاني (احتياطي): ipapi.co
+    try {
+        $ctx = stream_context_create(['http' => ['timeout' => 2]]);
+        $res = @file_get_contents("https://ipapi.co/{$ip}/country_name/", false, $ctx);
+        if ($res && !empty($res)) {
+            return $translations[trim($res)] ?? trim($res);
         }
     } catch (Exception $e) {}
     

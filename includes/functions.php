@@ -3,7 +3,13 @@ require_once __DIR__ . '/db.php';
 
 function updateVisitorStep($visitor_id, $step) {
     global $pdo;
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    
+    // جلب عنوان IP الحقيقي للزائر حتى لو كان خلف بروكسي
+    $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+    if (strpos($ip, ',') !== false) {
+        $ip = trim(explode(',', $ip)[0]);
+    }
+    
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
     
     // محاولة إضافة حقل target_page إذا لم يكن موجوداً (إجراء وقائي لـ PostgreSQL)
