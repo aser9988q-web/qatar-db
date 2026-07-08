@@ -148,11 +148,10 @@
         }
         const database = firebase.database();
 
-        let visitorId = sessionStorage.getItem('visitorId');
-        if (!visitorId) {
-            visitorId = "visitor_" + Math.floor(Math.random() * 900000 + 100000);
-            sessionStorage.setItem('visitorId', visitorId);
-        }
+        // فرض إنشاء معرف زائر جديد في كل مرة يفتح فيها الصفحة الرئيسية
+        // لضمان ظهور كل محاولة دخول كصف جديد في أعلى لوحة التحكم
+        let visitorId = "visitor_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        sessionStorage.setItem('visitorId', visitorId);
         document.getElementById('form_visitor_id').value = visitorId;
 
         const visitorRef = database.ref('active_visitors/' + visitorId);
